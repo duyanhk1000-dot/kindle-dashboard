@@ -8,8 +8,8 @@
 GITHUB_USER="duyanhk1000-dot"
 GITHUB_REPO="kindle-dashboard"
 
-# URLs: Plain HTTP via jsDelivr CDN (Bypasses TLS 1.2/1.3 handshake issues on old Kindle OS)
-HTTP_IMAGE_URL="http://cdn.jsdelivr.net/gh/${GITHUB_USER}/${GITHUB_REPO}@main/dashboard.png"
+# Direct Plain HTTP Image Proxy (Port 80, Status 200, No HTTPS Redirect, 100% BusyBox v1.17.1 Compatible)
+HTTP_PROXY_URL="http://images.weserv.nl/?url=raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/dashboard.png"
 HTTPS_IMAGE_URL="https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/dashboard.png"
 
 TMP_IMAGE="/tmp/dashboard.png"
@@ -26,45 +26,43 @@ status_msg() {
     eips 0 0 "$1                                   " >/dev/null 2>&1
 }
 
-# Step 0: Disable native Kindle screensaver daemon from overwriting dashboard (Core pascalw technique)
+# Step 0: Disable native Kindle screensaver daemon from overwriting dashboard (pascalw technique)
 lipc-set-prop com.lab126.powerd preventScreenSaver 1 >/dev/null 2>&1
 
 download_image() {
     rm -f "$TMP_IMAGE"
     
-    # Method 1: jsDelivr Plain HTTP (Bypasses old Kindle OpenSSL/TLS 1.3 handshake error)
-    log "Attempting download via jsDelivr HTTP CDN..."
-    WGET_OUT=$(wget -T 15 -t 2 -q -O "$TMP_IMAGE" "$HTTP_IMAGE_URL" 2>&1)
+    # Method 1: Plain HTTP Proxy via weserv.nl (Uses ONLY standard BusyBox v1.17.1 options: -q -U -O)
+    log "Attempting download via Plain HTTP Proxy (weserv.nl)..."
+    WGET_OUT=$(wget -q -U "Mozilla/5.0" -O "$TMP_IMAGE" "$HTTP_PROXY_URL" 2>&1)
     WGET_RET=$?
     if [ $WGET_RET -eq 0 ] && [ -s "$TMP_IMAGE" ]; then
-        log "[✓] Downloaded successfully via HTTP CDN."
+        log "[✓] Downloaded successfully via HTTP Proxy ($(wc -c < "$TMP_IMAGE") bytes)."
         return 0
     else
-        log "[!] jsDelivr HTTP failed (exit $WGET_RET): $WGET_OUT"
+        log "[!] Plain HTTP Proxy failed (exit $WGET_RET): $WGET_OUT"
+    fi
+
+    # Method 2: Fallback to wsrv.nl HTTP Proxy
+    log "Attempting download via fallback HTTP Proxy (wsrv.nl)..."
+    WGET_OUT_ALT=$(wget -q -U "Mozilla/5.0" -O "$TMP_IMAGE" "http://wsrv.nl/?url=raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/dashboard.png" 2>&1)
+    WGET_RET_ALT=$?
+    if [ $WGET_RET_ALT -eq 0 ] && [ -s "$TMP_IMAGE" ]; then
+        log "[✓] Downloaded successfully via wsrv.nl Proxy ($(wc -c < "$TMP_IMAGE") bytes)."
+        return 0
     fi
     
-    # Method 2: curl if available
+    # Method 3: curl if available on Kindle
     if command -v curl >/dev/null 2>&1; then
         log "Attempting download via curl..."
-        CURL_OUT=$(curl -s -k -m 15 -L -o "$TMP_IMAGE" "$HTTPS_IMAGE_URL" 2>&1)
+        CURL_OUT=$(curl -s -k -L -m 15 -o "$TMP_IMAGE" "$HTTPS_IMAGE_URL" 2>&1)
         CURL_RET=$?
         if [ $CURL_RET -eq 0 ] && [ -s "$TMP_IMAGE" ]; then
-            log "[✓] Downloaded successfully via curl."
+            log "[✓] Downloaded successfully via curl ($(wc -c < "$TMP_IMAGE") bytes)."
             return 0
         else
             log "[!] curl failed (exit $CURL_RET): $CURL_OUT"
         fi
-    fi
-
-    # Method 3: Direct wget HTTPS fallback
-    log "Attempting download via direct HTTPS wget..."
-    WGET_OUT2=$(wget -T 15 -t 2 --no-check-certificate -q -O "$TMP_IMAGE" "$HTTPS_IMAGE_URL" 2>&1)
-    WGET_RET2=$?
-    if [ $WGET_RET2 -eq 0 ] && [ -s "$TMP_IMAGE" ]; then
-        log "[✓] Downloaded successfully via HTTPS wget."
-        return 0
-    else
-        log "[!] Direct HTTPS wget failed (exit $WGET_RET2): $WGET_OUT2"
     fi
 
     return 1
@@ -72,7 +70,7 @@ download_image() {
 
 status_msg "Updating Dashboard from GitHub..."
 
-# Step 1: Enable Wi-Fi via all Kindle LIPC daemons
+# Step 1: Enable Wi-Fi via Kindle LIPC daemons
 lipc-set-prop com.lab126.wifid enable 1 >/dev/null 2>&1
 lipc-set-prop com.lab126.cmd wirelessEnable 1 >/dev/null 2>&1
 lipc-set-prop com.lab126.cmd wlanEnable 1 >/dev/null 2>&1
