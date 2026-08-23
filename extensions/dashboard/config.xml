@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension>
-    <name>Kindle Dashboard</name>
-    <version>2.0</version>
-    <author>Kiều Duy Anh</author>
-    <id>kindle_dashboard</id>
-    <action>
-        <item name="Refresh Smart Dashboard" priority="1">
-            <command>/mnt/us/dashboard/dashboard_runner.sh</command>
-        </item>
-    </action>
+	<name xml:lang="en">Kindle Dashboard</name>
+	<version>2.0</version>
+	<author>Kiều Duy Anh</author>
 </extension>

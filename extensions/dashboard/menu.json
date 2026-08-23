@@ -1,9 +1,11 @@
 {
-    "items": [
-        {
-            "name": "Refresh Smart Dashboard",
-            "priority": 1,
-            "action": "/mnt/us/dashboard/dashboard_runner.sh"
-        }
-    ]
+	"items": [
+		{
+			"name": "Refresh Smart Dashboard",
+			"priority": 1,
+			"action": "/bin/sh",
+			"params": ["/mnt/us/dashboard/dashboard_runner.sh"],
+			"exitmenu": true
+		}
+	]
 }
