@@ -30,28 +30,37 @@ download_image() {
     
     # Method 1: jsDelivr Plain HTTP (Bypasses old Kindle OpenSSL/TLS 1.3 handshake error)
     log "Attempting download via jsDelivr HTTP CDN..."
-    wget -T 15 -t 2 -q -O "$TMP_IMAGE" "$HTTP_IMAGE_URL"
-    if [ $? -eq 0 ] && [ -s "$TMP_IMAGE" ]; then
+    WGET_OUT=$(wget -T 15 -t 2 -O "$TMP_IMAGE" "$HTTP_IMAGE_URL" 2>&1)
+    WGET_RET=$?
+    if [ $WGET_RET -eq 0 ] && [ -s "$TMP_IMAGE" ]; then
         log "[✓] Downloaded successfully via HTTP CDN."
         return 0
+    else
+        log "[!] jsDelivr HTTP failed (exit $WGET_RET): $WGET_OUT"
     fi
     
     # Method 2: curl if available
     if command -v curl >/dev/null 2>&1; then
         log "Attempting download via curl..."
-        curl -s -k -m 15 -o "$TMP_IMAGE" "$HTTPS_IMAGE_URL"
-        if [ $? -eq 0 ] && [ -s "$TMP_IMAGE" ]; then
+        CURL_OUT=$(curl -s -k -m 15 -o "$TMP_IMAGE" "$HTTPS_IMAGE_URL" 2>&1)
+        CURL_RET=$?
+        if [ $CURL_RET -eq 0 ] && [ -s "$TMP_IMAGE" ]; then
             log "[✓] Downloaded successfully via curl."
             return 0
+        else
+            log "[!] curl failed (exit $CURL_RET): $CURL_OUT"
         fi
     fi
 
     # Method 3: Direct wget HTTPS fallback
     log "Attempting download via direct HTTPS wget..."
-    wget -T 15 -t 2 --no-check-certificate -q -O "$TMP_IMAGE" "$HTTPS_IMAGE_URL"
-    if [ $? -eq 0 ] && [ -s "$TMP_IMAGE" ]; then
+    WGET_OUT2=$(wget -T 15 -t 2 --no-check-certificate -O "$TMP_IMAGE" "$HTTPS_IMAGE_URL" 2>&1)
+    WGET_RET2=$?
+    if [ $WGET_RET2 -eq 0 ] && [ -s "$TMP_IMAGE" ]; then
         log "[✓] Downloaded successfully via HTTPS wget."
         return 0
+    else
+        log "[!] Direct HTTPS wget failed (exit $WGET_RET2): $WGET_OUT2"
     fi
 
     return 1
@@ -59,21 +68,31 @@ download_image() {
 
 status_msg "Updating Dashboard from GitHub..."
 
-# Step 1: Enable Wi-Fi
+# Step 1: Enable Wi-Fi via LIPC commands
+lipc-set-prop com.lab126.cmd wirelessEnable 1 >/dev/null 2>&1
 lipc-set-prop com.lab126.cmd wlanEnable 1 >/dev/null 2>&1
 
-# Step 2: Wait for Wi-Fi network connectivity (Up to 15 seconds)
+# Step 2: Wait for Wi-Fi LIPC cmState to reach CONNECTED
+log "Waiting for Wi-Fi connection (LIPC cmState)..."
 RETRY=0
 CONNECTED=0
-while [ $RETRY -lt 15 ]; do
-    if ping -c 1 8.8.8.8 >/dev/null 2>&1 || ping -c 1 cdn.jsdelivr.net >/dev/null 2>&1; then
+while [ $RETRY -lt 25 ]; do
+    CM_STATE=$(lipc-get-prop com.lab126.wifid cmState 2>/dev/null)
+    if [ "$CM_STATE" = "CONNECTED" ]; then
         CONNECTED=1
-        log "Wi-Fi Connected successfully."
+        log "[✓] Wi-Fi LIPC cmState: CONNECTED"
         break
     fi
     RETRY=$((RETRY + 1))
     sleep 1
 done
+
+if [ $CONNECTED -eq 0 ]; then
+    log "[!] Wi-Fi cmState did not reach CONNECTED within 25 seconds. Attempting download anyway..."
+fi
+
+# Extra 2-second sleep to ensure DNS resolution & DHCP IP routing table ready
+sleep 2
 
 # Step 3: Fetch dashboard image
 if download_image; then
@@ -88,6 +107,7 @@ else
 fi
 
 # Step 4: Turn OFF Wi-Fi to preserve battery
+lipc-set-prop com.lab126.cmd wirelessEnable 0 >/dev/null 2>&1
 lipc-set-prop com.lab126.cmd wlanEnable 0 >/dev/null 2>&1
 
 # Step 5: Enter RTC sleep loop only if daemon mode is specified
