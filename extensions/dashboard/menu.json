@@ -8,9 +8,17 @@
 					"name": "Refresh Dashboard Now",
 					"priority": 1,
 					"action": "/mnt/us/dashboard/dashboard_runner.sh",
-					"exitmenu": false,
+					"exitmenu": true,
 					"status": false,
-					"internal": "status Refreshing Kindle E-ink Smart Dashboard..."
+					"internal": "status Updating Dashboard..."
+				},
+				{
+					"name": "Start Auto-Refresh Daemon",
+					"priority": 2,
+					"action": "/mnt/us/dashboard/dashboard_runner.sh",
+					"params": "daemon",
+					"exitmenu": true,
+					"status": false
 				}
 			]
 		}
