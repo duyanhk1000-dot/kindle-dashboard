@@ -1,11 +1,18 @@
 {
 	"items": [
 		{
-			"name": "Refresh Smart Dashboard",
+			"name": "Kindle Dashboard",
 			"priority": 1,
-			"action": "/bin/sh",
-			"params": ["/mnt/us/dashboard/dashboard_runner.sh"],
-			"exitmenu": true
+			"items": [
+				{
+					"name": "Refresh Dashboard Now",
+					"priority": 1,
+					"action": "/mnt/us/dashboard/dashboard_runner.sh",
+					"exitmenu": false,
+					"status": false,
+					"internal": "status Refreshing Kindle E-ink Smart Dashboard..."
+				}
+			]
 		}
 	]
 }
