@@ -1,0 +1,30 @@
+{
+  "location": "Hà Nội",
+  "gold_sjc": "144.60 - 147.60 tr",
+  "gold_sjc_change": "+0.50%",
+  "vnindex": "1,768.12",
+  "vnindex_change": "+39.04 (+2.26%)",
+  "stock_watchlist": [
+    {
+      "symbol": "HPG",
+      "price": "21.70",
+      "change": "+2.12%"
+    },
+    {
+      "symbol": "NVL",
+      "price": "13.35",
+      "change": "+1.52%"
+    },
+    {
+      "symbol": "SSI",
+      "price": "20.75",
+      "change": "+3.23%"
+    }
+  ],
+  "custom_holidays": [
+    "• 19/08: Cách Mạng Tháng 8",
+    "• 22/08: Làm bù nghỉ lễ Quốc Khánh",
+    "• 26/08 (15/07 Âm): Lễ Vu Lan (Rằm Th.7)",
+    "• 29/08 - 02/09: Nghỉ lễ Quốc Khánh (5 ngày)"
+  ]
+}

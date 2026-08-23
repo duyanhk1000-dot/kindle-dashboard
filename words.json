@@ -1,0 +1,242 @@
+[
+  {
+    "character": "德",
+    "pinyin": "dé",
+    "han_viet": "ĐỨC",
+    "radicals": "Bộ Xích 彳(bước đi) + Tâm 心",
+    "breakdown": "彳(hành động) + 十(thẳng) + 罒(mắt) + 一(một) + 心(tâm). Mắt nhìn thẳng, lòng giữ một tâm chân thật, hành động ngay thẳng.",
+    "examples": "Đạo đức (道德), Phẩm đức (品德)"
+  },
+  {
+    "character": "愛",
+    "pinyin": "ài",
+    "han_viet": "ÁI",
+    "radicals": "Bộ Trảo 爫 + Mịch 𠯮 + Tâm 心 + Trĩ 夊",
+    "breakdown": "Trảo (đôi tay) chìa ra che chở cho Tâm (trái tim) và Trĩ (dấu chân chậm rãi đi tới). Yêu thương là ôm ấp trái tim bằng sự chân thành.",
+    "examples": "Ái tình (愛情), Bác ái (博愛)"
+  },
+  {
+    "character": "和",
+    "pinyin": "hé",
+    "han_viet": "HÒA",
+    "radicals": "Bộ Hòa 禾(lúa) + Khẩu 口(miệng)",
+    "breakdown": "Hòa (cây lúa mang lại lương thực) kết hợp Khẩu (miệng ăn). Mọi người cùng có cơm ăn thì xã hội hòa bình, êm đẹp.",
+    "examples": "Hòa bình (和平), Thích hợp (適合)"
+  },
+  {
+    "character": "忍",
+    "pinyin": "rěn",
+    "han_viet": "NHẪN",
+    "radicals": "Bộ Đao 刀(dao) + Tâm 心(lòng)",
+    "breakdown": "Đao (lưỡi dao) nằm ngay trên Tâm (trái tim). Nhẫn nại là dù bị đâm đau đớn vẫn kiềm chế, giữ lòng kiên định.",
+    "examples": "Nhẫn nại (忍耐), Kiên nhẫn (堅忍)"
+  },
+  {
+    "character": "靜",
+    "pinyin": "jìng",
+    "han_viet": "TĨNH",
+    "radicals": "Bộ Thanh 青(xanh) + Tranh 爭(tranh chấp)",
+    "breakdown": "Thanh (màu xanh tươi tĩnh lặng) đè nén Tranh (sự tranh giành). Tâm yên tĩnh thì chiến thắng sự xô xát bồng bột.",
+    "examples": "Tĩnh lặng (靜寂), Bình tĩnh (平靜)"
+  },
+  {
+    "character": "信",
+    "pinyin": "xìn",
+    "han_viet": "TÍN",
+    "radicals": "Bộ Nhân 人(người) + Ngôn 言(nói)",
+    "breakdown": "Nhân (con người) đứng cạnh Ngôn (lời nói). Lời người nói ra phải trung thực, giữ đúng lời hứa mới có Uy tín.",
+    "examples": "Uy tín (威信), Tự tin (自信)"
+  },
+  {
+    "character": "義",
+    "pinyin": "yì",
+    "han_viet": "NGHĨA",
+    "radicals": "Bộ Dương 羊(dê) + Ngã 我(tôi)",
+    "breakdown": "Dương (con dê cúng hiến tế đại diện cho điều tốt đẹp) đặt trên Ngã (bản thân). Đặt việc nghĩa lên trên cái tôi cá nhân.",
+    "examples": "Nghĩa khí (義氣), Trách nhiệm (責任)"
+  },
+  {
+    "character": "智",
+    "pinyin": "zhì",
+    "han_viet": "TRÍ",
+    "radicals": "Bộ Tri 知(hiểu biết) + Nhật 日(mặt trời)",
+    "breakdown": "Tri (kiến thức lời nói) soi sáng bởi Nhật (ánh sáng mặt trời). Trí tuệ là sự hiểu biết sáng suốt như ánh mặt trời.",
+    "examples": "Trí tuệ (智慧), Lý trí (理智)"
+  },
+  {
+    "character": "孝",
+    "pinyin": "xiào",
+    "han_viet": "HIẾU",
+    "radicals": "Bộ Lão 老(người già) + Tử 子(con)",
+    "breakdown": "Lão (người già) ở trên Tử (đứa con) ở dưới. Con cái cõng, nâng đỡ và phụng dưỡng cha mẹ lúc tuổi già.",
+    "examples": "Hiếu thảo (孝順), Hiếu kính (孝敬)"
+  },
+  {
+    "character": "福",
+    "pinyin": "fú",
+    "han_viet": "PHÚC",
+    "radicals": "Bộ Thị 示(thần linh) + Nhất 一 + Khẩu 口 + Điền 田",
+    "breakdown": "Thị (trời đất ban) cho Nhất (một) Khẩu (miệng ăn) có Điền (ruộng đất cày cấy). Đủ ăn đủ mặc, gia đình êm ấm là Hạnh phúc.",
+    "examples": "Hạnh phúc (幸福), Phúc khí (福氣)"
+  },
+  {
+    "character": "安",
+    "pinyin": "ān",
+    "han_viet": "AN",
+    "radicals": "Bộ Miên 宀(mái nhà) + Nữ 女(phụ nữ)",
+    "breakdown": "Miên (mái nhà) che chở cho Nữ (người phụ nữ). Trong nhà có người phụ nữ bình yên coi sóc thì gia đình an tâm, an lành.",
+    "examples": "An bình (安平), An tâm (安心)"
+  },
+  {
+    "character": "心",
+    "pinyin": "xīn",
+    "han_viet": "TÂM",
+    "radicals": "Bộ Tâm 心",
+    "breakdown": "Hình vẽ tượng hình trái tim co bóp với các ngăn tim. Tâm là nguồn gốc của tư tưởng, cảm xúc và đạo đức con người.",
+    "examples": "Tâm trí (心智), Chân tâm (真心)"
+  },
+  {
+    "character": "學",
+    "pinyin": "xué",
+    "han_viet": "HỌC",
+    "radicals": "Bộ Tử 子(đứa trẻ) + Miên 宀(mái trường)",
+    "breakdown": "Hai tay trao tri thức bên dưới mái nhà che chở cho đứa trẻ (Tử). Học tập là trao truyền tri thức cho thế hệ sau.",
+    "examples": "Học tập (學習), Học vấn (學問)"
+  },
+  {
+    "character": "道",
+    "pinyin": "dào",
+    "han_viet": "ĐẠO",
+    "radicals": "Bộ Sước 辶(bước đi) + Thủ 首(đầu/hướng)",
+    "breakdown": "Thủ (người dẫn đầu, suy nghĩ) kết hợp Sước (hành trình bước đi). Đạo là con đường chân lý được soi sáng bởi trí tuệ.",
+    "examples": "Đạo đức (道德), Con đường (道路)"
+  },
+  {
+    "character": "誠",
+    "pinyin": "chéng",
+    "han_viet": "THÀNH",
+    "radicals": "Bộ Ngôn 言(lời nói) + Thành 成(hoàn thành)",
+    "breakdown": "Ngôn (lời nói) kết hợp Thành (sự thực hiện hoàn thành). Thành thực là lời nói đi đôi với việc làm, không dối trá.",
+    "examples": "Chân thành (真誠), Thành thực (誠實)"
+  },
+  {
+    "character": "勇",
+    "pinyin": "yǒng",
+    "han_viet": "DŨNG",
+    "radicals": "Bộ Lực 力(sức mạnh) + Dũng 甬",
+    "breakdown": "Ý chí trào dâng kết hợp với Lực (sức mạnh thể chất và tinh thần). Dũng cảm là khí thế mạnh mẽ vượt qua sợ hãi.",
+    "examples": "Dũng cảm (勇敢), Dũng khí (勇氣)"
+  },
+  {
+    "character": "善",
+    "pinyin": "shàn",
+    "han_viet": "THIỆN",
+    "radicals": "Bộ Dương 羊(dê tốt lành) + Ngôn 言(lời nói)",
+    "breakdown": "Dương (biểu tượng tốt đẹp cao quý) phát ra từ Ngôn (lời nói và hành động). Lương thiện là lời nói dịu dàng, hướng thiện.",
+    "examples": "Lương thiện ( lương善), Thiện cảm (善感)"
+  },
+  {
+    "character": "禮",
+    "pinyin": "lǐ",
+    "han_viet": "LỄ",
+    "radicals": "Bộ Thị 示(thần linh) + Lý 豐(chén cúng)",
+    "breakdown": "Thị (sự thành kính hướng tới trời đất thần linh) dâng lên Lý (đĩa lễ vật). Lễ phép là sự tôn trọng, mực thước trong ứng xử.",
+    "examples": "Lễ phép (禮貌), Lễ nghi (禮儀)"
+  },
+  {
+    "character": "明",
+    "pinyin": "míng",
+    "han_viet": "MINH",
+    "radicals": "Bộ Nhật 日(mặt trời) + Nguyệt 月(mặt trăng)",
+    "breakdown": "Nhật (mặt trời ban ngày) kết hợp Nguyệt (mặt trăng ban đêm). Hai nguồn sáng hội tụ mang lại sự sáng suốt, rõ ràng.",
+    "examples": "Minh bạch (明白), Sáng suốt (聰明)"
+  },
+  {
+    "character": "家",
+    "pinyin": "jiā",
+    "han_viet": "GIA",
+    "radicals": "Bộ Miên 宀(mái nhà) + Thỉ 豕(con heo)",
+    "breakdown": "Miên (mái nhà che chở) bên trong nuôi Thỉ (gia súc/con heo đại diện tài sản ổn định). Gia đình là nơi trú ẩn ấm cúng.",
+    "examples": "Gia đình (家庭), Quê hương (家鄉)"
+  },
+  {
+    "character": "忠",
+    "pinyin": "zhōng",
+    "han_viet": "TRUNG",
+    "radicals": "Bộ Trung 中(ở giữa) + Tâm 心(trái tim)",
+    "breakdown": "Trung (chính giữa, không lệch lạc) đặt ngay trên Tâm (trái tim). Trung thành là giữ tâm ngay thẳng, không hai lòng.",
+    "examples": "Trung thành (忠誠), Trung thực (忠實)"
+  },
+  {
+    "character": "廉",
+    "pinyin": "lián",
+    "han_viet": "LIÊM",
+    "radicals": "Bộ Quảng 廣(mái nhà) + Kiêm 兼(gặt hái)",
+    "breakdown": "Sống trong căn nhà Quảng góc cạnh rõ ràng, giữ sự Kiêm toàn tự chế. Liêm khiết là giữ lòng thanh cao, không tham lam.",
+    "examples": "Liêm khiết (廉潔), Thanh liêm (清廉)"
+  },
+  {
+    "character": "恥",
+    "pinyin": "chǐ",
+    "han_viet": "SỈ",
+    "radicals": "Bộ Nhĩ 耳(tai) + Tâm 心(lòng)",
+    "breakdown": "Nhĩ (tai nghe thấy lời chê trách) dội vào Tâm (lòng biết hổ thẹn). Biết hổ thẹn là khởi đầu của việc sửa mình tiến bộ.",
+    "examples": "Liêm sỉ (廉恥), Hổ thẹn (羞恥)"
+  },
+  {
+    "character": "寬",
+    "pinyin": "kuān",
+    "han_viet": "KHOAN",
+    "radicals": "Bộ Miên 宀 + Thảo 艹 + Kiến 見",
+    "breakdown": "Mái nhà rộng mở, tầm mắt rộng nhìn ra xa (Kiến). Khoan dung là mở rộng tấm lòng bao dung cho lỗi lầm của người khác.",
+    "examples": "Khoan dung (寬容), Broad-minded (寬宏)"
+  },
+  {
+    "character": "毅",
+    "pinyin": "yì",
+    "han_viet": "NGHỊ",
+    "radicals": "Bộ Thỉ 豕 + Thù 殳",
+    "breakdown": "Tinh thần kiên cường như con lợn rừng không lùi bước trước vũ khí. Kiên nghị là quyết tâm vững vàng trước khó khăn.",
+    "examples": "Kiên nghị (堅毅), Nghị lực (毅力)"
+  },
+  {
+    "character": "勤",
+    "pinyin": "qín",
+    "han_viet": "CẦN",
+    "radicals": "Bộ Cần 堇 + Lực 力(sức lực)",
+    "breakdown": "Dùng Lực (sức mạnh và sự vất vả) siêng năng cày cấy không ngừng. Cần cù là sự chăm chỉ kiên trì mang lại thành công.",
+    "examples": "Cần cù (勤勞), Cần mẫn (勤奮)"
+  },
+  {
+    "character": "儉",
+    "pinyin": "jiǎn",
+    "han_viet": "KIỆM",
+    "radicals": "Bộ Nhân 人(người) + Thiểm 僉",
+    "breakdown": "Nhân (con người) tự kiềm chế ham muốn tiêu xài. Tiết kiệm là trân trọng sức lao động và tài nguyên tích lũy.",
+    "examples": "Tiết kiệm (節儉), Cần kiệm (勤儉)"
+  },
+  {
+    "character": "恕",
+    "pinyin": "shù",
+    "han_viet": "THỨ",
+    "radicals": "Bộ Như 如(như người khác) + Tâm 心(lòng)",
+    "breakdown": "Như (đặt mình vào vị trí người khác) bằng cả Tâm (trái tim). Tha thứ là thấu hiểu và sẻ chia với nỗi niềm đối phương.",
+    "examples": "Vị tha (寬恕), Thứ lỗi (恕罪)"
+  },
+  {
+    "character": "敬",
+    "pinyin": "jìng",
+    "han_viet": "KÍNH",
+    "radicals": "Bộ Cẩu 茍(cẩn trọng) + Phộc 攴(gõ nhè nhẹ)",
+    "breakdown": "Giữ thái độ nghiêm cẩn Cẩu và hành xử đúng mực Phộc. Tôn kính là sự kính trọng chân thành xuất phát từ nội tâm.",
+    "examples": "Tôn kính (尊敬), Kính trọng (敬重)"
+  },
+  {
+    "character": "信",
+    "pinyin": "xìn",
+    "han_viet": "TÍN",
+    "radicals": "Bộ Nhân 人(người) + Ngôn 言(lời nói)",
+    "breakdown": "Lời nói của con người được chứng thực qua thời gian và hành động. Tín nhiệm là nền tảng của mọi mối quan hệ.",
+    "examples": "Tín nhiệm (信任), Tín nghĩa (信義)"
+  }
+]
