@@ -1,6 +1,7 @@
 #!/bin/sh
 # ==============================================================================
 # Kindle Touch 4th Gen (D01200) Smart Dashboard Shell Runner Script
+# Architecture based on pascalw/kindle-dash & MobileRead E-ink standards
 # Location: /mnt/us/dashboard/dashboard_runner.sh
 # ==============================================================================
 
@@ -25,12 +26,15 @@ status_msg() {
     eips 0 0 "$1                                   " >/dev/null 2>&1
 }
 
+# Step 0: Disable native Kindle screensaver daemon from overwriting dashboard (Core pascalw technique)
+lipc-set-prop com.lab126.powerd preventScreenSaver 1 >/dev/null 2>&1
+
 download_image() {
     rm -f "$TMP_IMAGE"
     
     # Method 1: jsDelivr Plain HTTP (Bypasses old Kindle OpenSSL/TLS 1.3 handshake error)
     log "Attempting download via jsDelivr HTTP CDN..."
-    WGET_OUT=$(wget -T 15 -t 2 -O "$TMP_IMAGE" "$HTTP_IMAGE_URL" 2>&1)
+    WGET_OUT=$(wget -T 15 -t 2 -q -O "$TMP_IMAGE" "$HTTP_IMAGE_URL" 2>&1)
     WGET_RET=$?
     if [ $WGET_RET -eq 0 ] && [ -s "$TMP_IMAGE" ]; then
         log "[✓] Downloaded successfully via HTTP CDN."
@@ -42,7 +46,7 @@ download_image() {
     # Method 2: curl if available
     if command -v curl >/dev/null 2>&1; then
         log "Attempting download via curl..."
-        CURL_OUT=$(curl -s -k -m 15 -o "$TMP_IMAGE" "$HTTPS_IMAGE_URL" 2>&1)
+        CURL_OUT=$(curl -s -k -m 15 -L -o "$TMP_IMAGE" "$HTTPS_IMAGE_URL" 2>&1)
         CURL_RET=$?
         if [ $CURL_RET -eq 0 ] && [ -s "$TMP_IMAGE" ]; then
             log "[✓] Downloaded successfully via curl."
@@ -54,7 +58,7 @@ download_image() {
 
     # Method 3: Direct wget HTTPS fallback
     log "Attempting download via direct HTTPS wget..."
-    WGET_OUT2=$(wget -T 15 -t 2 --no-check-certificate -O "$TMP_IMAGE" "$HTTPS_IMAGE_URL" 2>&1)
+    WGET_OUT2=$(wget -T 15 -t 2 --no-check-certificate -q -O "$TMP_IMAGE" "$HTTPS_IMAGE_URL" 2>&1)
     WGET_RET2=$?
     if [ $WGET_RET2 -eq 0 ] && [ -s "$TMP_IMAGE" ]; then
         log "[✓] Downloaded successfully via HTTPS wget."
@@ -68,7 +72,8 @@ download_image() {
 
 status_msg "Updating Dashboard from GitHub..."
 
-# Step 1: Enable Wi-Fi via LIPC commands
+# Step 1: Enable Wi-Fi via all Kindle LIPC daemons
+lipc-set-prop com.lab126.wifid enable 1 >/dev/null 2>&1
 lipc-set-prop com.lab126.cmd wirelessEnable 1 >/dev/null 2>&1
 lipc-set-prop com.lab126.cmd wlanEnable 1 >/dev/null 2>&1
 
@@ -97,16 +102,18 @@ sleep 2
 # Step 3: Fetch dashboard image
 if download_image; then
     status_msg "Rendering Dashboard Image..."
+    # Full screen refresh via eips -f -g (pascalw technique to clear ghosting)
     eips -c >/dev/null 2>&1
     sleep 1
-    eips -g "$TMP_IMAGE" >/dev/null 2>&1
-    log "[✓] Framebuffer updated successfully via eips."
+    eips -f -g "$TMP_IMAGE" >/dev/null 2>&1
+    log "[✓] Framebuffer updated successfully via eips -f -g."
 else
     status_msg "Error: Download failed. Check Wi-Fi."
     log "[!] Download failed across all CDN/HTTP/HTTPS endpoints."
 fi
 
 # Step 4: Turn OFF Wi-Fi to preserve battery
+lipc-set-prop com.lab126.wifid enable 0 >/dev/null 2>&1
 lipc-set-prop com.lab126.cmd wirelessEnable 0 >/dev/null 2>&1
 lipc-set-prop com.lab126.cmd wlanEnable 0 >/dev/null 2>&1
 
