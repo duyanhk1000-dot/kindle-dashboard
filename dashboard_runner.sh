@@ -3,6 +3,9 @@
 # Kindle Touch 4th Gen (D01200) Smart Dashboard Shell Runner Script
 # Architecture based on pascalw/kindle-dash & MobileRead E-ink standards
 # Location: /mnt/us/dashboard/dashboard_runner.sh
+# Target Schedule:
+#   - 00:00 ICT (Midnight date & Hanzi change)
+#   - 15:30 ICT (Stock market closing session update)
 # ==============================================================================
 
 GITHUB_USER="duyanhk1000-dot"
@@ -14,7 +17,6 @@ HTTP_IMAGE_URL="http://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/m
 
 TMP_IMAGE="/tmp/dashboard.png"
 LOG_FILE="/mnt/us/dashboard/dashboard.log"
-SLEEP_SECONDS=43200
 
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$LOG_FILE"
@@ -23,6 +25,32 @@ log() {
 status_msg() {
     log "$1"
     eips 0 0 "$1                                   " >/dev/null 2>&1
+}
+
+# Calculate seconds until next target wakeup time (15:35 or 00:05 ICT)
+calc_next_wakeup() {
+    CURR_H=$(date +%H | sed 's/^0//')
+    CURR_M=$(date +%M | sed 's/^0//')
+    [ -z "$CURR_H" ] && CURR_H=0
+    [ -z "$CURR_M" ] && CURR_M=0
+    
+    NOW_MIN=$((CURR_H * 60 + CURR_M))
+    
+    TARGET_1530=930   # 15:30 in minutes from 00:00
+    TARGET_0000=1440  # 00:00 (Midnight) in minutes
+    
+    if [ $NOW_MIN -lt $TARGET_1530 ]; then
+        SLEEP_MIN=$((TARGET_1530 - NOW_MIN))
+    else
+        SLEEP_MIN=$((TARGET_0000 - NOW_MIN))
+    fi
+    
+    # Add 5 minutes buffer (300 seconds) so GitHub Actions finishes rendering first
+    SLEEP_SEC=$((SLEEP_MIN * 60 + 300))
+    if [ $SLEEP_SEC -lt 1800 ]; then
+        SLEEP_SEC=1800
+    fi
+    echo $SLEEP_SEC
 }
 
 # Step 0: Disable native Kindle screensaver daemon from overwriting dashboard (pascalw technique)
@@ -104,7 +132,8 @@ lipc-set-prop com.lab126.cmd wlanEnable 0 >/dev/null 2>&1
 
 # Step 5: Enter RTC sleep loop only if daemon mode is specified
 if [ "$1" = "daemon" ]; then
-    log "Scheduling RTC Wakeup in $SLEEP_SECONDS seconds..."
+    SLEEP_SECONDS=$(calc_next_wakeup)
+    log "Scheduling Next Smart Wakeup in $SLEEP_SECONDS seconds..."
     if [ -c /dev/rtc1 ]; then
         rtcwake -d /dev/rtc1 -m mem -s "$SLEEP_SECONDS"
     else
