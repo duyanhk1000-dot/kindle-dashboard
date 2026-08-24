@@ -184,6 +184,33 @@ class MarketCrawler:
 
         return results
 
+    def _fetch_from_simplize_api(self, symbols: List[str]) -> Dict[str, Any]:
+        """Fetch live real-time stock quotes from Simplize Public REST API."""
+        results = {}
+        print(f"[+] [Provider: Simplize API] Fetching quotes for {symbols}...")
+        for sym in symbols:
+            if sym.upper() == "VNINDEX":
+                continue
+            url = f"https://api2.simplize.vn/api/company/summary/{sym.upper()}"
+            try:
+                resp = requests.get(url, headers=self.headers, timeout=5)
+                if resp.status_code == 200:
+                    data = resp.json().get("data", {})
+                    if data and "priceClose" in data:
+                        p_close = data.get("priceClose", 0)
+                        p_chg = data.get("pctChange", 0.0)
+                        if p_close and p_close > 0:
+                            p_str = f"{p_close / 1000.0:.2f}" if p_close > 100 else f"{p_close:.2f}"
+                            c_str = f"{p_chg:+.2f}%"
+                            results[sym.upper()] = {"price": p_str, "change": c_str}
+            except Exception as e:
+                print(f"[!] Simplize API error for {sym}: {e}")
+
+        if results:
+            print(f"[OK] [Provider: Simplize API] Scraped {len(results)} live stock quotes successfully.")
+
+        return results
+
     def crawl_normalized_market_data(self, watchlist_symbols: List[str], config_baseline: Dict[str, Any]) -> Dict[str, Any]:
         """
         Execute Multi-Provider Fallback Pipeline to return normalized market dictionary.
@@ -195,8 +222,12 @@ class MarketCrawler:
         # 0. Scrape SJC Gold Price directly from giavang.org
         gold_data = self._fetch_from_giavang_org()
 
-        # 1. Try vnstock library first if available
-        crawled_data.update(self._fetch_from_vnstock_lib(all_symbols))
+        # 1. Fetch live stock quotes via Simplize API
+        crawled_data.update(self._fetch_from_simplize_api(watchlist_symbols))
+
+        # 2. Try vnstock library if available
+        if not set(all_symbols).issubset(crawled_data.keys()):
+            crawled_data.update(self._fetch_from_vnstock_lib(all_symbols))
 
         # 2. Try KBSV Priceboard
         if not set(all_symbols).issubset(crawled_data.keys()):
