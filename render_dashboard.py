@@ -455,8 +455,8 @@ def load_single_chinese_word(now_dt):
     return default_word
 
 
-def draw_wrapped_text(draw, text, font, x, y, max_width, fill, line_spacing=2):
-    """Draw word-wrapped text cleanly within bounding box."""
+def draw_wrapped_text(draw, text, font, x, y, max_width, fill, line_spacing=2, stroke_width=0, stroke_fill=None):
+    """Draw word-wrapped text cleanly within bounding box with optional bold stroke."""
     words = text.split(" ")
     lines = []
     current_line = ""
@@ -476,7 +476,10 @@ def draw_wrapped_text(draw, text, font, x, y, max_width, fill, line_spacing=2):
 
     curr_y = y
     for line in lines:
-        draw.text((x, curr_y), line, font=font, fill=fill)
+        if stroke_width > 0:
+            draw.text((x, curr_y), line, font=font, fill=fill, stroke_width=stroke_width, stroke_fill=stroke_fill or fill)
+        else:
+            draw.text((x, curr_y), line, font=font, fill=fill)
         bbox = draw.textbbox((0, 0), line, font=font)
         h = bbox[3] - bbox[1]
         curr_y += h + line_spacing
@@ -618,44 +621,47 @@ def render_dashboard():
     
     curr_y = 512
     draw.text((left_x, curr_y), "• Bộ thủ:", font=fonts["small_bold"], fill=COLOR_BLACK)
-    curr_y = draw_wrapped_text(draw, rad_str, fonts["hanzi_small"], left_x + 56, curr_y, left_w - 56, COLOR_BLACK) + 2
+    curr_y = draw_wrapped_text(draw, rad_str, fonts["hanzi_small"], left_x + 56, curr_y, left_w - 56, COLOR_BLACK, line_spacing=2, stroke_width=1, stroke_fill=COLOR_BLACK) + 3
 
     # Breakdown (Chiết tự) line
     draw.text((left_x, curr_y), "• Chiết tự:", font=fonts["small_bold"], fill=COLOR_BLACK)
-    curr_y = draw_wrapped_text(draw, word["breakdown"], fonts["hanzi_small"], left_x + 64, curr_y, left_w - 64, COLOR_BLACK) + 2
+    curr_y = draw_wrapped_text(draw, word["breakdown"], fonts["hanzi_small"], left_x + 64, curr_y, left_w - 64, COLOR_BLACK, line_spacing=2, stroke_width=1, stroke_fill=COLOR_BLACK) + 3
 
     # Examples (Ví dụ) line
-    draw.text((left_x, curr_y), f"• Ví dụ: {word.get('examples', '')}", font=fonts["hanzi_small"], fill=COLOR_BLACK)
+    draw.text((left_x, curr_y), f"• Ví dụ: {word.get('examples', '')}", font=fonts["hanzi_small"], fill=COLOR_BLACK, stroke_width=1, stroke_fill=COLOR_BLACK)
+    curr_y += 18
 
-    # Section Divider Line Pushed Down to Y: 595 to prevent overlap with Weather!
-    draw.line([(left_x, 595), (305, 595)], fill=COLOR_GRAY_MID, width=1)
+    # Dynamic Section Divider Line below Ví dụ
+    draw.line([(left_x, curr_y), (305, curr_y)], fill=COLOR_GRAY_MID, width=1)
 
     # -------------------------------------------------------------------------
-    # THỜI TIẾT 3 NGÀY - SHIFTED DOWN TO Y: 602 TO PREVENT OVERLAP
+    # THỜI TIẾT 3 NGÀY - DYNAMIC POSITION PREVENTS OVERLAP
     # -------------------------------------------------------------------------
-    draw.text((left_x, 602), "THỜI TIẾT 3 NGÀY", font=fonts["header"], fill=COLOR_BLACK)
+    weather_header_y = curr_y + 6
+    draw.text((left_x, weather_header_y), "THỜI TIẾT 3 NGÀY", font=fonts["header"], fill=COLOR_BLACK)
     
     loc_str = f"({cfg.get('location', 'Hà Nội').upper()})"
     bbox_loc = draw.textbbox((0, 0), loc_str, font=fonts["small_bold"])
     loc_w = bbox_loc[2] - bbox_loc[0]
-    draw.text((305 - loc_w, 604), loc_str, font=fonts["small_bold"], fill=COLOR_GRAY_DARK)
+    draw.text((305 - loc_w, weather_header_y + 2), loc_str, font=fonts["small_bold"], fill=COLOR_GRAY_DARK)
 
-    draw.line([(left_x, 623), (305, 623)], fill=COLOR_BLACK, width=1)
+    weather_line_y = weather_header_y + 21
+    draw.line([(left_x, weather_line_y), (305, weather_line_y)], fill=COLOR_BLACK, width=1)
 
     weather = fetch_weather_data(cfg.get("location", "Hà Nội"))
 
     # Tighter spacing for 3-day weather items
-    w_y = 628
+    w_y = weather_line_y + 5
     for w_day in weather["days"]:
         draw.text((left_x, w_y), f"• {w_day['day']}:", font=fonts["body_bold"], fill=COLOR_BLACK)
         w_detail = f"{w_day['symbol']} {w_day['code']} | {w_day['temp']}"
-        draw.text((left_x + 82, w_y), w_detail, font=fonts["body"], fill=COLOR_BLACK)
-        w_y += 21
+        draw.text((left_x + 82, w_y), w_detail, font=fonts["body_bold"], fill=COLOR_BLACK)
+        w_y += 20
 
-    # Tightened gap above Air Quality & Humidity
-    draw.line([(left_x, 694), (305, 694)], fill=COLOR_GRAY_LIGHT, width=1)
-    draw.text((left_x, 700), f"• Chất lượng không khí: AQI {weather['aqi']}", font=fonts["body_bold"], fill=COLOR_BLACK)
-    draw.text((left_x, 719), f"• Cảm giác như: {weather['feels_like']} | Độ ẩm: {weather.get('humidity', '75%')}", font=fonts["body_bold"], fill=COLOR_BLACK)
+    # Gap above Air Quality & Humidity
+    draw.line([(left_x, w_y + 2), (305, w_y + 2)], fill=COLOR_GRAY_LIGHT, width=1)
+    draw.text((left_x, w_y + 7), f"• Chất lượng không khí: AQI {weather['aqi']}", font=fonts["body_bold"], fill=COLOR_BLACK)
+    draw.text((left_x, w_y + 24), f"• Cảm giác như: {weather['feels_like']} | Độ ẩm: {weather.get('humidity', '75%')}", font=fonts["body_bold"], fill=COLOR_BLACK)
 
 
     # =========================================================================
