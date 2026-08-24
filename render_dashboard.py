@@ -621,14 +621,14 @@ def render_dashboard():
     
     curr_y = 512
     draw.text((left_x, curr_y), "• Bộ thủ:", font=fonts["small_bold"], fill=COLOR_BLACK)
-    curr_y = draw_wrapped_text(draw, rad_str, fonts["hanzi_small"], left_x + 56, curr_y, left_w - 56, COLOR_BLACK, line_spacing=2, stroke_width=1, stroke_fill=COLOR_BLACK) + 3
+    curr_y = draw_wrapped_text(draw, rad_str, fonts["hanzi_small"], left_x + 56, curr_y, left_w - 56, COLOR_BLACK, line_spacing=2) + 3
 
     # Breakdown (Chiết tự) line
     draw.text((left_x, curr_y), "• Chiết tự:", font=fonts["small_bold"], fill=COLOR_BLACK)
-    curr_y = draw_wrapped_text(draw, word["breakdown"], fonts["hanzi_small"], left_x + 64, curr_y, left_w - 64, COLOR_BLACK, line_spacing=2, stroke_width=1, stroke_fill=COLOR_BLACK) + 3
+    curr_y = draw_wrapped_text(draw, word["breakdown"], fonts["hanzi_small"], left_x + 64, curr_y, left_w - 64, COLOR_BLACK, line_spacing=2) + 3
 
     # Examples (Ví dụ) line
-    draw.text((left_x, curr_y), f"• Ví dụ: {word.get('examples', '')}", font=fonts["hanzi_small"], fill=COLOR_BLACK, stroke_width=1, stroke_fill=COLOR_BLACK)
+    draw.text((left_x, curr_y), f"• Ví dụ: {word.get('examples', '')}", font=fonts["hanzi_small"], fill=COLOR_BLACK)
     curr_y += 18
 
     # Dynamic Section Divider Line below Ví dụ
