@@ -180,8 +180,8 @@ def get_fonts(font_files):
         fonts["small_bold"] = ImageFont.truetype(font_files["latin_bold"], 12)
         
         # Hanzi / Chinese fonts (Supports CJK glyphs)
-        fonts["hanzi_big"] = ImageFont.truetype(font_files["hanzi"], 48)
-        fonts["hanzi_small"] = ImageFont.truetype(font_files["hanzi"], 12)
+        fonts["hanzi_big"] = ImageFont.truetype(font_files["hanzi"], 56)
+        fonts["hanzi_small"] = ImageFont.truetype(font_files["hanzi"], 13)
     except Exception as e:
         print(f"[!] Warning loading custom fonts ({e}). Falling back to default.")
         default = ImageFont.load_default()
@@ -571,8 +571,11 @@ def render_dashboard():
     stocks = market_data.get("stocks", [])
     stock_y = 359
     for stk in stocks[:3]:
-        stk_str = f"{stk['symbol']}: {stk['price']} ({stk['change']})"
-        draw.text((sub2_x + 2, stock_y), stk_str, font=fonts["small"], fill=COLOR_BLACK)
+        sym = stk.get("symbol", "")
+        price = stk.get("price", "18.50")
+        change = stk.get("change", "+0.00%")
+        stk_str = f"{sym}: {price} ({change})"
+        draw.text((sub2_x + 2, stock_y), stk_str, font=fonts["small_bold"], fill=COLOR_BLACK)
         stock_y += 15
 
     # Section Divider Line (Padded Y: 412)
@@ -599,32 +602,30 @@ def render_dashboard():
     ch_h = ch_bbox[3] - ch_bbox[1]
     
     cx_pos = box_x1 + (box_w - ch_w) // 2 - ch_bbox[0]
-    cy_pos = box_y1 + (box_h - ch_h) // 2 - ch_bbox[1] - 2
+    cy_pos = box_y1 + (box_h - ch_h) // 2 - ch_bbox[1] - 4
     draw.text((cx_pos, cy_pos), ch, font=fonts["hanzi_big"], fill=COLOR_BLACK)
 
-    # Info Column (Pinyin & Han-Viet): X: 88 -> 186
+    # Info Column (Pinyin & Han-Viet): X: 88 -> 305
     info_x = left_x + 70
-    draw.text((info_x, 448), f"Pinyin: {word['pinyin']}", font=fonts["body_bold"], fill=COLOR_BLACK)
-    draw.text((info_x, 470), f"Hán-Việt: {word['han_viet']}", font=fonts["body_bold"], fill=COLOR_BLACK)
+    draw.text((info_x, 452), f"Pinyin: {word['pinyin']}", font=fonts["body_bold"], fill=COLOR_BLACK)
+    draw.text((info_x, 478), f"Hán-Việt: {word['han_viet']}", font=fonts["body_bold"], fill=COLOR_BLACK)
 
-    # Radicals Column (Pushed further right to X: 192)
-    rad_x = 192
-    draw.text((rad_x, 448), "Bộ thủ:", font=fonts["small_bold"], fill=COLOR_BLACK)
-    
-    rad_y = 464
+    # Single Line for Radicals (Bộ thủ) below box
     rad_list = word.get("radicals", [])
     if isinstance(rad_list, str):
         rad_list = [rad_list]
-    for r_item in rad_list:
-        draw_wrapped_text(draw, r_item, fonts["body_bold"], rad_x, rad_y, 305 - rad_x, COLOR_BLACK)
-        rad_y += 16
+    rad_str = " ".join(rad_list)
+    
+    curr_y = 512
+    draw.text((left_x, curr_y), "• Bộ thủ:", font=fonts["small_bold"], fill=COLOR_BLACK)
+    curr_y = draw_wrapped_text(draw, rad_str, fonts["hanzi_small"], left_x + 56, curr_y, left_w - 56, COLOR_BLACK) + 2
 
-    curr_y = max(rad_y + 2, 513)
-    draw.text((left_x, curr_y), "Chiết tự:", font=fonts["small_bold"], fill=COLOR_BLACK)
-    curr_y = draw_wrapped_text(draw, word["breakdown"], fonts["body_bold"], left_x, curr_y + 14, left_w, COLOR_BLACK)
+    # Breakdown (Chiết tự) line
+    draw.text((left_x, curr_y), "• Chiết tự:", font=fonts["small_bold"], fill=COLOR_BLACK)
+    curr_y = draw_wrapped_text(draw, word["breakdown"], fonts["hanzi_small"], left_x + 64, curr_y, left_w - 64, COLOR_BLACK) + 2
 
-    curr_y += 3
-    draw.text((left_x, curr_y), f"Ví dụ: {word.get('examples', '')}", font=fonts["body_bold"], fill=COLOR_BLACK)
+    # Examples (Ví dụ) line
+    draw.text((left_x, curr_y), f"• Ví dụ: {word.get('examples', '')}", font=fonts["hanzi_small"], fill=COLOR_BLACK)
 
     # Section Divider Line Pushed Down to Y: 595 to prevent overlap with Weather!
     draw.line([(left_x, 595), (305, 595)], fill=COLOR_GRAY_MID, width=1)
