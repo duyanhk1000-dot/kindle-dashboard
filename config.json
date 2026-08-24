@@ -7,19 +7,13 @@
   "vnindex_change": "+39.04 (+2.26%)",
   "stock_watchlist": [
     {
-      "symbol": "HPG",
-      "price": "21.70",
-      "change": "+2.12%"
+      "symbol": "HPG"
     },
     {
-      "symbol": "NVL",
-      "price": "13.35",
-      "change": "+1.52%"
+      "symbol": "NVL"
     },
     {
-      "symbol": "SSI",
-      "price": "20.75",
-      "change": "+3.23%"
+      "symbol": "SSI"
     }
   ],
   "custom_holidays": [
