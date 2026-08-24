@@ -3,6 +3,7 @@
 # Kindle Touch 4th Gen (D01200) Smart Dashboard Shell Runner Script
 # Architecture based on pascalw/kindle-dash & MobileRead E-ink standards
 # Location: /mnt/us/dashboard/dashboard_runner.sh
+# Features: Anti-Cache Timestamp URL & Full E-ink Anti-Ghosting Flash Refresh
 # Target Schedule:
 #   - 00:00 ICT (Midnight date & Hanzi change)
 #   - 15:30 ICT (Stock market closing session update)
@@ -10,10 +11,6 @@
 
 GITHUB_USER="duyanhk1000-dot"
 GITHUB_REPO="kindle-dashboard"
-
-# URLs: Direct GitHub Raw HTTPS & HTTP fallback
-HTTPS_IMAGE_URL="https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/dashboard.png"
-HTTP_IMAGE_URL="http://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/dashboard.png"
 
 TMP_IMAGE="/tmp/dashboard.png"
 LOG_FILE="/mnt/us/dashboard/dashboard.log"
@@ -59,13 +56,18 @@ lipc-set-prop com.lab126.powerd preventScreenSaver 1 >/dev/null 2>&1
 download_image() {
     rm -f "$TMP_IMAGE"
     
+    # Dynamic anti-cache timestamp URL parameter
+    TIMESTAMP=$(date +%s 2>/dev/null || echo "100")
+    HTTPS_URL="https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/dashboard.png?t=${TIMESTAMP}"
+    HTTP_URL="http://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/dashboard.png?t=${TIMESTAMP}"
+
     # Method 1: curl with -k -L (Standard method for Jailbroken Kindles, 100% handles HTTPS & redirects)
     if command -v curl >/dev/null 2>&1 || [ -x /usr/bin/curl ]; then
-        log "Attempting download via curl..."
-        curl -s -k -L -m 20 -o "$TMP_IMAGE" "$HTTPS_IMAGE_URL"
+        log "Attempting download via curl with anti-cache timestamp..."
+        curl -s -k -L -m 20 -o "$TMP_IMAGE" "$HTTPS_URL"
         SIZE=$(wc -c < "$TMP_IMAGE" 2>/dev/null || echo 0)
         if [ "$SIZE" -gt 20000 ]; then
-            log "[✓] Downloaded valid PNG via curl ($SIZE bytes)."
+            log "[✓] Downloaded fresh PNG via curl ($SIZE bytes)."
             return 0
         else
             log "[!] curl output invalid size ($SIZE bytes)."
@@ -73,11 +75,11 @@ download_image() {
     fi
 
     # Method 2: wget fallback
-    log "Attempting download via wget..."
-    wget -q -U "Mozilla/5.0" -O "$TMP_IMAGE" "$HTTP_IMAGE_URL" 2>&1
+    log "Attempting download via wget with anti-cache timestamp..."
+    wget -q -U "Mozilla/5.0" -O "$TMP_IMAGE" "$HTTP_URL" 2>&1
     SIZE=$(wc -c < "$TMP_IMAGE" 2>/dev/null || echo 0)
     if [ "$SIZE" -gt 20000 ]; then
-        log "[✓] Downloaded valid PNG via wget ($SIZE bytes)."
+        log "[✓] Downloaded fresh PNG via wget ($SIZE bytes)."
         return 0
     else
         log "[!] wget output invalid size ($SIZE bytes)."
@@ -111,13 +113,18 @@ done
 # Extra 2-second sleep to ensure DNS resolution ready
 sleep 2
 
-# Step 3: Fetch dashboard image
+# Step 3: Fetch dashboard image and render with full E-ink anti-ghosting flash refresh
 if download_image; then
     status_msg "Rendering Dashboard Image..."
-    # Clear screen and status bar
+    
+    # Anti-ghosting Step 1: Prevent screen saver
+    lipc-set-prop com.lab126.powerd preventScreenSaver 1 >/dev/null 2>&1
+    
+    # Anti-ghosting Step 2: Clear screen to pure white
     eips -c >/dev/null 2>&1
     sleep 1
-    # Full screen refresh via eips -f -g
+    
+    # Anti-ghosting Step 3: Perform full screen flash refresh and render PNG image
     eips -f -g "$TMP_IMAGE" >/dev/null 2>&1
     log "[✓] Framebuffer updated successfully via eips -f -g."
 else
