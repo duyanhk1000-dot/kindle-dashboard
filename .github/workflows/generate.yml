@@ -2,10 +2,10 @@ name: Render Kindle Dashboard
 
 on:
   schedule:
-    # 17:00 UTC = 00:00 ICT (Midnight date & Hanzi change)
-    # 08:30 UTC = 15:30 ICT (Stock market closing session update)
-    - cron: '0 17 * * *'
-    - cron: '30 8 * * *'
+    # 16:55 UTC = 23:55 ICT (Renders 5 mins before 00:00 ICT Midnight date & Hanzi change)
+    # 08:25 UTC = 15:25 ICT (Renders 5 mins before 15:30 ICT Stock market closing update)
+    - cron: '55 16 * * *'
+    - cron: '25 8 * * *'
   workflow_dispatch: # Allows manual trigger from GitHub UI
 
 permissions:
