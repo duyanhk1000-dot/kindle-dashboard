@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kindle Dashboard Configurator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 pb-12">
+    <!-- Header Navbar -->
+    <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-tablet-screen-button text-sky-400 text-2xl"></i>
+                <h1 class="font-bold text-xl tracking-wide">Kindle Dashboard Configurator</h1>
+            </div>
+            <span class="text-xs bg-sky-900 text-sky-200 border border-sky-700 px-2.5 py-1 rounded-full font-mono">v2.0 Online</span>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 mt-8">
+        <!-- Toast Status Banner -->
+        <div id="statusToast" class="hidden mb-6 p-4 rounded-xl shadow-md border text-sm transition-all duration-300"></div>
+
+        <form id="configForm" onsubmit="return false;" class="space-y-6">
+            <!-- 1. Tiêu đề Dashboard -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center font-bold">1</div>
+                    <h2 class="text-lg font-bold text-slate-900">Tiêu đề Dashboard</h2>
+                </div>
+                <p class="text-xs text-slate-5-00 mb-3">Hiển thị ở đai tiêu đề trên cùng của màn hình Kindle.</p>
+                <input type="text" id="dashboardTitle" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-sm font-medium" placeholder="KIỀU DUY ANH - KINDLE DASHBOARD">
+            </div>
+
+            <!-- 2. Danh mục 3 Cổ phiếu theo dõi -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">2</div>
+                    <h2 class="text-lg font-bold text-slate-900">Cổ phiếu theo dõi (3 Mã)</h2>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Nhập mã chứng khoán sàn HOSE/HNX (Tự động cập nhật giá đóng cửa lúc 15:30).</p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Mã Cổ phiếu 1</label>
+                        <input type="text" id="stock1" class="w-full px-4 py-2 rounded-xl border border-slate-300 text-sm uppercase font-mono tracking-wider focus:ring-2 focus:ring-indigo-500" placeholder="HPG">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Mã Cổ phiếu 2</label>
+                        <input type="text" id="stock2" class="w-full px-4 py-2 rounded-xl border border-slate-300 text-sm uppercase font-mono tracking-wider focus:ring-2 focus:ring-indigo-500" placeholder="NVL">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Mã Cổ phiếu 3</label>
+                        <input type="text" id="stock3" class="w-full px-4 py-2 rounded-xl border border-slate-300 text-sm uppercase font-mono tracking-wider focus:ring-2 focus:ring-indigo-500" placeholder="SSI">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Địa điểm dự báo thời tiết -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center font-bold">3</div>
+                    <h2 class="text-lg font-bold text-slate-900">Địa điểm Dự báo Thời tiết</h2>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Chọn hoặc nhập Tỉnh/Thành phố dự báo thời tiết 3 ngày + AQI + Độ ẩm.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Chọn Thành phố nhanh</label>
+                        <select id="locationSelect" onchange="updateLocationInput()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-amber-500 bg-white">
+                            <option value="Hà Nội">Hà Nội</option>
+                            <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh (Sài Gòn)</option>
+                            <option value="Đà Nẵng">Đà Nẵng</option>
+                            <option value="Hải Phòng">Hải Phòng</option>
+                            <option value="Nha Trang">Nha Trang</option>
+                            <option value="Cần Thơ">Cần Thơ</option>
+                            <option value="Huế">Huế</option>
+                            <option value="Vũng Tàu">Vũng Tàu</option>
+                            <option value="Đà Lạt">Đà Lạt</option>
+                            <option value="Quy Nhơn">Quy Nhơn</option>
+                            <option value="Buôn Ma Thuột">Buôn Ma Thuột</option>
+                            <option value="custom">-- Nhập tên khác --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Tên hiển thị trên Dashboard</label>
+                        <input type="text" id="locationInput" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-amber-500" placeholder="Hà Nội">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Lịch Cá nhân & Sự kiện -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">4</div>
+                        <h2 class="text-lg font-bold text-slate-900">Lịch Cá nhân & Sự kiện Tùy chỉnh</h2>
+                    </div>
+                    <button type="button" onclick="addHolidayRow()" class="text-xs bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-lg font-semibold flex items-center space-x-1 transition">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Thêm sự kiện</span>
+                    </button>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Thêm ngày lễ, sinh nhật, ngày kỷ niệm hoặc lịch làm bù cá nhân.</p>
+                <div id="holidaysList" class="space-y-2">
+                    <!-- Dynamic Holiday Rows -->
+                </div>
+            </div>
+
+            <!-- 5. Tải Ảnh cá nhân lên thư mục photos/ -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center font-bold">5</div>
+                    <h2 class="text-lg font-bold text-slate-900">Tải Ảnh Cá nhân (photos/)</h2>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Tải file ảnh gia đình / cá nhân từ thiết bị lên để Kindle xoay vòng hiển thị daily.</p>
+                
+                <div class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-purple-400 transition bg-slate-50">
+                    <input type="file" id="photoFileInput" accept="image/*" onchange="handlePhotoSelect(event)" class="hidden">
+                    <label for="photoFileInput" class="cursor-pointer flex flex-col items-center justify-center space-y-2">
+                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-purple-500"></i>
+                        <span class="text-sm font-semibold text-slate-700">Bấm vào đây để chọn ảnh từ máy</span>
+                        <span class="text-xs text-slate-400">Hỗ trợ JPG, PNG, WEBP (Tự động chuyển Grayscale)</span>
+                    </label>
+                </div>
+                
+                <!-- Preview Container -->
+                <div id="photoPreviewBox" class="hidden mt-4 p-4 border border-slate-200 rounded-xl bg-slate-50 flex items-center space-x-4">
+                    <img id="photoPreviewImg" class="w-20 h-20 object-cover rounded-lg border shadow-sm" alt="Preview">
+                    <div class="flex-1 min-w-0">
+                        <p id="photoFileName" class="text-sm font-semibold text-slate-800 truncate"></p>
+                        <p id="photoFileSize" class="text-xs text-slate-500"></p>
+                    </div>
+                    <button type="button" onclick="cancelPhotoSelect()" class="text-rose-500 hover:text-rose-700 p-2 text-sm">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 6. Cấu hình GitHub Access Token -->
+            <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-lg">
+                <div class="flex items-center space-x-3 mb-3">
+                    <i class="fa-brands fa-github text-2xl text-sky-400"></i>
+                    <h2 class="text-lg font-bold">Cấu hình Đồng bộ GitHub</h2>
+                </div>
+                <p class="text-xs text-slate-400 mb-4">Điền GitHub Token (chỉ lưu an toàn trên trình duyệt của bạn) để tự động commit config và render ảnh mới.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">GitHub Username</label>
+                        <input type="text" id="githubOwner" class="w-full px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm font-mono" placeholder="duyanhk1000-dot">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Repository Name</label>
+                        <input type="text" id="githubRepo" class="w-full px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm font-mono" placeholder="kindle-dashboard">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Personal Access Token (PAT)</label>
+                    <input type="password" id="githubToken" class="w-full px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm font-mono" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-2">
+                <button type="button" onclick="saveConfigToGitHub()" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg hover:shadow-sky-500/25 flex items-center justify-center space-x-2 transition">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span>LƯU CẤU HÌNH & RENDER NGAY</span>
+                </button>
+                <button type="button" onclick="downloadConfigFile()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-3.5 px-6 rounded-xl flex items-center justify-center space-x-2 transition">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Tải File config.json</span>
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        let currentConfig = {
+            dashboard_title: "KIỀU DUY ANH - KINDLE DASHBOARD",
+            location: "Hà Nội",
+            stock_watchlist: [{symbol: "HPG"}, {symbol: "NVL"}, {symbol: "SSI"}],
+            custom_holidays: [
+                "• 19/08: Cách Mạng Tháng 8",
+                "• 22/08: Làm bù nghỉ lễ Quốc Khánh",
+                "• 26/08 (15/07 Âm): Lễ Vu Lan (Rằm Th.7)",
+                "• 29/08 - 02/09: Nghỉ lễ Quốc Khánh (5 ngày)"
+            ]
+        };
+
+        let selectedPhotoData = null; // { name, base64 }
+
+        // Initialize Form
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSavedGitHubSettings();
+            fetchCurrentConfig();
+        });
+
+        function loadSavedGitHubSettings() {
+            document.getElementById('githubOwner').value = localStorage.getItem('gh_owner') || 'duyanhk1000-dot';
+            document.getElementById('githubRepo').value = localStorage.getItem('gh_repo') || 'kindle-dashboard';
+            document.getElementById('githubToken').value = localStorage.getItem('gh_token') || '';
+        }
+
+        function saveGitHubSettings() {
+            localStorage.setItem('gh_owner', document.getElementById('githubOwner').value.trim());
+            localStorage.setItem('gh_repo', document.getElementById('githubRepo').value.trim());
+            localStorage.setItem('gh_token', document.getElementById('githubToken').value.trim());
+        }
+
+        async function fetchCurrentConfig() {
+            try {
+                const res = await fetch('https://raw.githubusercontent.com/duyanhk1000-dot/kindle-dashboard/main/config.json?t=' + Date.now());
+                if (res.ok) {
+                    currentConfig = await res.json();
+                }
+            } catch (e) {
+                console.log('Using default config');
+            }
+            populateForm(currentConfig);
+        }
+
+        function populateForm(cfg) {
+            document.getElementById('dashboardTitle').value = cfg.dashboard_title || "KIỀU DUY ANH - KINDLE DASHBOARD";
+            
+            const stocks = cfg.stock_watchlist || [];
+            document.getElementById('stock1').value = stocks[0]?.symbol || "HPG";
+            document.getElementById('stock2').value = stocks[1]?.symbol || "NVL";
+            document.getElementById('stock3').value = stocks[2]?.symbol || "SSI";
+
+            const loc = cfg.location || "Hà Nội";
+            document.getElementById('locationInput').value = loc;
+            
+            const locSelect = document.getElementById('locationSelect');
+            if ([...locSelect.options].some(o => o.value === loc)) {
+                locSelect.value = loc;
+            } else {
+                locSelect.value = "custom";
+            }
+
+            renderHolidaysList(cfg.custom_holidays || []);
+        }
+
+        function updateLocationInput() {
+            const selectVal = document.getElementById('locationSelect').value;
+            if (selectVal !== "custom") {
+                document.getElementById('locationInput').value = selectVal;
+            }
+        }
+
+        function renderHolidaysList(holidays) {
+            const container = document.getElementById('holidaysList');
+            container.innerHTML = '';
+            
+            holidays.forEach((h, idx) => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center space-x-2';
+                row.innerHTML = `
+                    <input type="text" class="holiday-item flex-1 px-4 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500" value="${escapeHtml(h)}">
+                    <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700 p-2 text-sm">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function addHolidayRow() {
+            const container = document.getElementById('holidaysList');
+            const row = document.createElement('div');
+            row.className = 'flex items-center space-x-2';
+            row.innerHTML = `
+                <input type="text" class="holiday-item flex-1 px-4 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500" placeholder="• 15/09: Sinh nhật gia đình">
+                <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700 p-2 text-sm">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            `;
+            container.appendChild(row);
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        }
+
+        function handlePhotoSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Content = e.target.result.split(',')[1];
+                selectedPhotoData = {
+                    name: file.name.replace(/[^a-zA-Z0-9_.-]/g, '_'),
+                    base64: base64Content,
+                    dataUrl: e.target.result,
+                    size: (file.size / 1024).toFixed(1) + ' KB'
+                };
+
+                document.getElementById('photoPreviewImg').src = e.target.result;
+                document.getElementById('photoFileName').innerText = file.name;
+                document.getElementById('photoFileSize').innerText = selectedPhotoData.size;
+                document.getElementById('photoPreviewBox').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function cancelPhotoSelect() {
+            selectedPhotoData = null;
+            document.getElementById('photoFileInput').value = '';
+            document.getElementById('photoPreviewBox').classList.add('hidden');
+        }
+
+        function buildConfigFromForm() {
+            const holidays = [...document.querySelectorAll('.holiday-item')]
+                .map(el => el.value.trim())
+                .filter(v => v.length > 0);
+
+            return {
+                dashboard_title: document.getElementById('dashboardTitle').value.trim() || "KIỀU DUY ANH - KINDLE DASHBOARD",
+                location: document.getElementById('locationInput').value.trim() || "Hà Nội",
+                gold_sjc: currentConfig.gold_sjc || "144.60 - 147.60 tr",
+                gold_sjc_change: currentConfig.gold_sjc_change || "+0.50%",
+                vnindex: currentConfig.vnindex || "1,768.12",
+                vnindex_change: currentConfig.vnindex_change || "+39.04 (+2.26%)",
+                stock_watchlist: [
+                    { symbol: (document.getElementById('stock1').value.trim() || "HPG").toUpperCase() },
+                    { symbol: (document.getElementById('stock2').value.trim() || "NVL").toUpperCase() },
+                    { symbol: (document.getElementById('stock3').value.trim() || "SSI").toUpperCase() }
+                ],
+                custom_holidays: holidays
+            };
+        }
+
+        function showToast(msg, type = 'info') {
+            const toast = document.getElementById('statusToast');
+            toast.className = `mb-6 p-4 rounded-xl shadow-md border text-sm transition-all duration-300 `;
+            if (type === 'success') {
+                toast.className += 'bg-emerald-50 text-emerald-800 border-emerald-200';
+            } else if (type === 'error') {
+                toast.className += 'bg-rose-50 text-rose-800 border-rose-200';
+            } else {
+                toast.className += 'bg-sky-50 text-sky-800 border-sky-200';
+            }
+            toast.innerHTML = msg;
+            toast.classList.remove('hidden');
+        }
+
+        async function saveConfigToGitHub() {
+            saveGitHubSettings();
+            const owner = document.getElementById('githubOwner').value.trim();
+            const repo = document.getElementById('githubRepo').value.trim();
+            const token = document.getElementById('githubToken').value.trim();
+
+            if (!token) {
+                showToast('<strong>Vui lòng điền Personal Access Token (PAT)</strong> để thực hiện lưu tự động!', 'error');
+                return;
+            }
+
+            const updatedConfig = buildConfigFromForm();
+            showToast('<i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang lưu config.json lên GitHub...', 'info');
+
+            try {
+                // 1. Fetch current sha of config.json
+                const getFileRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/config.json`, {
+                    headers: { 'Authorization': `token ${token}` }
+                });
+                
+                let sha = null;
+                if (getFileRes.ok) {
+                    const fileData = await getFileRes.json();
+                    sha = fileData.sha;
+                }
+
+                // 2. Commit updated config.json
+                const jsonContent = JSON.stringify(updatedConfig, null, 2);
+                const putRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/config.json`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: 'Update config.json via Web Configurator',
+                        content: btoa(unescape(encodeURIComponent(jsonContent))),
+                        sha: sha
+                    })
+                });
+
+                if (!putRes.ok) {
+                    throw new Error('Lỗi commit config.json (HTTP ' + putRes.status + ')');
+                }
+
+                // 3. Upload Personal Photo if selected
+                if (selectedPhotoData) {
+                    showToast('<i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải ảnh cá nhân vào thư mục photos/...', 'info');
+                    const photoPath = `photos/${selectedPhotoData.name}`;
+                    
+                    // Check if photo exists for sha
+                    const photoRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${photoPath}`, {
+                        headers: { 'Authorization': `token ${token}` }
+                    });
+                    let photoSha = null;
+                    if (photoRes.ok) {
+                        const photoData = await photoRes.json();
+                        photoSha = photoData.sha;
+                    }
+
+                    await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${photoPath}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: `Upload personal photo ${selectedPhotoData.name}`,
+                            content: selectedPhotoData.base64,
+                            sha: photoSha
+                        })
+                    });
+                }
+
+                // 4. Trigger GitHub Actions Dispatch
+                showToast('<i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang kích hoạt GitHub Actions render ảnh...', 'info');
+                await fetch(`https://api.github.com/repos/${owner}/${repo}/actions/workflows/generate.yml/dispatches`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ ref: 'main' })
+                });
+
+                showToast('<i class="fa-solid fa-circle-check text-emerald-600 mr-2"></i><strong>Thành công!</strong> Đã lưu cấu hình và kích hoạt GitHub Actions render ảnh mới!', 'success');
+                cancelPhotoSelect();
+
+            } catch (err) {
+                showToast('<strong>Lỗi:</strong> ' + err.message, 'error');
+            }
+        }
+
+        function downloadConfigFile() {
+            const updatedConfig = buildConfigFromForm();
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(updatedConfig, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "config.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+    </script>
+</body>
+</html>

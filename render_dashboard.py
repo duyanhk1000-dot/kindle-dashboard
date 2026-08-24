@@ -248,12 +248,35 @@ def fetch_daily_image(target_w=572, target_h=263, now_dt=None):
     return img, source_name
 
 
-def fetch_weather_data():
-    """Fetch 3-day forecast with Monochrome symbols, AQI, Feels-like temp, and Humidity."""
-    print("[+] Fetching Open-Meteo weather data for Hanoi...")
+def fetch_weather_data(location_name="Hà Nội"):
+    """Fetch 3-day forecast with Monochrome symbols, AQI, Feels-like temp, and Humidity for target city."""
+    city_coords = {
+        "hà nội": (21.0285, 105.8542),
+        "tp.hồ chí minh": (10.8231, 106.6297),
+        "tp. hồ chí minh": (10.8231, 106.6297),
+        "sài gòn": (10.8231, 106.6297),
+        "hồ chí minh": (10.8231, 106.6297),
+        "đà nẵng": (16.0544, 108.2022),
+        "hải phòng": (20.8449, 106.6881),
+        "nha trang": (12.2388, 109.1967),
+        "cần thơ": (10.0452, 105.7469),
+        "huế": (16.4637, 107.5909),
+        "vũng tàu": (10.3460, 107.0843),
+        "đà lạt": (11.9404, 108.4583),
+        "quy nhơn": (13.7820, 109.2194),
+        "buôn ma thuột": (12.6667, 108.0500)
+    }
+    
+    loc_key = str(location_name).strip().lower()
+    lat, lon = city_coords.get(loc_key, (21.0285, 105.8542))
+    
+    try:
+        print(f"[+] Fetching Open-Meteo weather data for {location_name} (Lat: {lat}, Lon: {lon})...")
+    except:
+        print(f"[+] Fetching Open-Meteo weather data (Lat: {lat}, Lon: {lon})...")
     url = (
-        "https://api.open-meteo.com/v1/forecast?"
-        "latitude=21.0285&longitude=105.8542"
+        f"https://api.open-meteo.com/v1/forecast?"
+        f"latitude={lat}&longitude={lon}"
         "&daily=weathercode,temperature_2m_max,temperature_2m_min"
         "&current_weather=true"
         "&timezone=Asia%2FBangkok"
@@ -485,7 +508,7 @@ def render_dashboard():
     # =========================================================================
     draw.rectangle([14, 8, 586, 38], fill=COLOR_WHITE, outline=COLOR_BLACK, width=1)
     
-    header_title = "KIỀU DUY ANH - KINDLE DASHBOARD"
+    header_title = cfg.get("dashboard_title", "KIỀU DUY ANH - KINDLE DASHBOARD")
     today_l_day, today_l_month = convert_solar_to_lunar(now.day, now.month, now.year)
     
     wd_names = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật"]
@@ -619,7 +642,7 @@ def render_dashboard():
 
     draw.line([(left_x, 623), (305, 623)], fill=COLOR_BLACK, width=1)
 
-    weather = fetch_weather_data()
+    weather = fetch_weather_data(cfg.get("location", "Hà Nội"))
 
     # Tighter spacing for 3-day weather items
     w_y = 628
