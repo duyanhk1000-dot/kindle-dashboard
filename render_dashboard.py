@@ -142,13 +142,15 @@ def ensure_fonts():
     font_files = {
         "latin": os.path.join(FONTS_DIR, "NotoSans-Regular.ttf"),
         "latin_bold": os.path.join(FONTS_DIR, "NotoSans-Bold.ttf"),
-        "hanzi": os.path.join(FONTS_DIR, "NotoSansSC-Regular.ttf")
+        "hanzi": os.path.join(FONTS_DIR, "NotoSansSC-Regular.ttf"),
+        "hanzi_bold": os.path.join(FONTS_DIR, "NotoSansSC-Bold.otf")
     }
 
     urls = {
         "latin": FONT_LATIN_URL,
         "latin_bold": FONT_LATIN_BOLD_URL,
-        "hanzi": FONT_HANZI_URL
+        "hanzi": FONT_HANZI_URL,
+        "hanzi_bold": "https://cdn.jsdelivr.net/gh/googlefonts/noto-cjk@main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Bold.otf"
     }
 
     for key, filepath in font_files.items():
@@ -180,8 +182,9 @@ def get_fonts(font_files):
         fonts["small_bold"] = ImageFont.truetype(font_files["latin_bold"], 12)
         
         # Hanzi / Chinese fonts (Supports CJK glyphs)
-        fonts["hanzi_big"] = ImageFont.truetype(font_files["hanzi"], 56)
-        fonts["hanzi_small"] = ImageFont.truetype(font_files["hanzi"], 13)
+        hanzi_font_path = font_files.get("hanzi_bold") if os.path.exists(font_files.get("hanzi_bold", "")) else font_files["hanzi"]
+        fonts["hanzi_big"] = ImageFont.truetype(hanzi_font_path, 56)
+        fonts["hanzi_small"] = ImageFont.truetype(hanzi_font_path, 14)
     except Exception as e:
         print(f"[!] Warning loading custom fonts ({e}). Falling back to default.")
         default = ImageFont.load_default()
