@@ -105,39 +105,57 @@
                         <span>Thêm sự kiện</span>
                     </button>
                 </div>
-                <p class="text-xs text-slate-500 mb-3">Thêm ngày lễ, sinh nhật, ngày kỷ niệm hoặc lịch làm bù cá nhân.</p>
+                <p class="text-xs text-slate-500 mb-3">Thêm ngày lễ, sinh nhật, ngày kỷ niệm hoặc lịch làm bù cá nhân (Tối đa 7 sự kiện hiển thị đẹp).</p>
                 <div id="holidaysList" class="space-y-2">
                     <!-- Dynamic Holiday Rows -->
                 </div>
             </div>
 
-            <!-- 5. Tải Ảnh cá nhân lên thư mục photos/ -->
+            <!-- 5. Tải & Quản lý Ảnh cá nhân (photos/) -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                 <div class="flex items-center space-x-3 mb-4">
                     <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center font-bold">5</div>
-                    <h2 class="text-lg font-bold text-slate-900">Tải Ảnh Cá nhân (photos/)</h2>
+                    <h2 class="text-lg font-bold text-slate-900">Thư viện Ảnh Cá nhân (photos/)</h2>
                 </div>
-                <p class="text-xs text-slate-500 mb-3">Tải file ảnh gia đình / cá nhân từ thiết bị lên để Kindle xoay vòng hiển thị daily.</p>
+                <p class="text-xs text-slate-500 mb-3">Tải ảnh mới hoặc quản lý/xóa ảnh cũ đang có trên GitHub để Kindle xoay vòng hiển thị daily.</p>
                 
+                <!-- Upload Input Area -->
                 <div class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-purple-400 transition bg-slate-50">
                     <input type="file" id="photoFileInput" accept="image/*" onchange="handlePhotoSelect(event)" class="hidden">
                     <label for="photoFileInput" class="cursor-pointer flex flex-col items-center justify-center space-y-2">
                         <i class="fa-solid fa-cloud-arrow-up text-3xl text-purple-500"></i>
-                        <span class="text-sm font-semibold text-slate-700">Bấm vào đây để chọn ảnh từ máy</span>
+                        <span class="text-sm font-semibold text-slate-700">Bấm vào đây để chọn ảnh mới từ máy</span>
                         <span class="text-xs text-slate-400">Hỗ trợ JPG, PNG, WEBP (Tự động chuyển Grayscale)</span>
                     </label>
                 </div>
                 
-                <!-- Preview Container -->
-                <div id="photoPreviewBox" class="hidden mt-4 p-4 border border-slate-200 rounded-xl bg-slate-50 flex items-center space-x-4">
+                <!-- New Photo Upload Preview Container -->
+                <div id="photoPreviewBox" class="hidden mt-4 p-4 border border-purple-200 rounded-xl bg-purple-50 flex items-center space-x-4">
                     <img id="photoPreviewImg" class="w-20 h-20 object-cover rounded-lg border shadow-sm" alt="Preview">
                     <div class="flex-1 min-w-0">
                         <p id="photoFileName" class="text-sm font-semibold text-slate-800 truncate"></p>
                         <p id="photoFileSize" class="text-xs text-slate-500"></p>
+                        <p class="text-[11px] text-purple-700 font-medium">✨ Ảnh mới này sẽ được tải lên khi bấm Lưu bên dưới</p>
                     </div>
                     <button type="button" onclick="cancelPhotoSelect()" class="text-rose-500 hover:text-rose-700 p-2 text-sm">
                         <i class="fa-solid fa-trash"></i>
                     </button>
+                </div>
+
+                <!-- Existing Photos Thumbnail Gallery Container -->
+                <div class="mt-6 pt-4 border-t border-slate-200">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm font-bold text-slate-800 flex items-center space-x-2">
+                            <i class="fa-solid fa-images text-purple-600"></i>
+                            <span>Danh sách ảnh hiện có trên GitHub (Bấm Xóa để bỏ ảnh)</span>
+                        </h3>
+                        <button type="button" onclick="loadExistingPhotos()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-2.5 py-1 rounded-lg border font-medium transition">
+                            <i class="fa-solid fa-rotate mr-1"></i>Tải lại danh sách
+                        </button>
+                    </div>
+                    <div id="existingPhotosGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <!-- Dynamic Photo Thumbnail Cards -->
+                    </div>
                 </div>
             </div>
 
@@ -197,6 +215,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             loadSavedGitHubSettings();
             fetchCurrentConfig();
+            loadExistingPhotos();
         });
 
         function loadSavedGitHubSettings() {
@@ -313,6 +332,86 @@
             document.getElementById('photoPreviewBox').classList.add('hidden');
         }
 
+        async function loadExistingPhotos() {
+            const owner = document.getElementById('githubOwner').value.trim() || 'duyanhk1000-dot';
+            const repo = document.getElementById('githubRepo').value.trim() || 'kindle-dashboard';
+            const container = document.getElementById('existingPhotosGrid');
+            container.innerHTML = '<div class="col-span-full text-xs text-slate-400 py-3 text-center"><i class="fa-solid fa-spinner fa-spin mr-1"></i>Đang tải danh sách ảnh...</div>';
+
+            try {
+                const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/photos?t=` + Date.now());
+                if (!res.ok) {
+                    container.innerHTML = '<div class="col-span-full text-xs text-slate-400 py-3 text-center">Chưa có ảnh nào trong thư mục photos/.</div>';
+                    return;
+                }
+                const files = await res.json();
+                const validPhotos = files.filter(f => f.name.match(/\.(jpg|jpeg|png|webp)$/i));
+
+                if (validPhotos.length === 0) {
+                    container.innerHTML = '<div class="col-span-full text-xs text-slate-400 py-3 text-center">Chưa có ảnh nào trong thư mục photos/.</div>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                validPhotos.forEach(photo => {
+                    const card = document.createElement('div');
+                    card.className = 'relative group rounded-xl overflow-hidden border border-slate-200 bg-slate-900 shadow-sm';
+                    card.innerHTML = `
+                        <img src="${photo.download_url}" class="w-full h-24 object-cover opacity-90 group-hover:opacity-100 transition" alt="${photo.name}">
+                        <div class="absolute bottom-0 inset-x-0 bg-slate-900/85 backdrop-blur-sm p-1.5 flex justify-between items-center text-[10px] text-white">
+                            <span class="truncate max-w-[100px] font-mono" title="${photo.name}">${escapeHtml(photo.name)}</span>
+                            <button type="button" onclick="deleteExistingPhoto('${photo.name}', '${photo.sha}')" class="text-rose-400 hover:text-rose-300 p-1 font-bold" title="Xóa ảnh này">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (e) {
+                container.innerHTML = '<div class="col-span-full text-xs text-rose-500 py-3 text-center">Không thể tải danh sách ảnh.</div>';
+            }
+        }
+
+        async function deleteExistingPhoto(fileName, sha) {
+            const owner = document.getElementById('githubOwner').value.trim();
+            const repo = document.getElementById('githubRepo').value.trim();
+            const token = document.getElementById('githubToken').value.trim();
+
+            if (!token) {
+                showToast('<strong>Vui lòng điền Personal Access Token (PAT)</strong> ở khung bên dưới để thực hiện xóa ảnh!', 'error');
+                return;
+            }
+
+            if (!confirm(`Bạn có chắc chắn muốn xóa ảnh "${fileName}" trên GitHub không?`)) {
+                return;
+            }
+
+            showToast(`<i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang xóa ảnh ${fileName}...`, 'info');
+
+            try {
+                const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/photos/${fileName}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `Delete photo ${fileName} via Web Configurator`,
+                        sha: sha
+                    })
+                });
+
+                if (res.ok) {
+                    showToast(`Đã xóa ảnh <strong>${fileName}</strong> thành công!`, 'success');
+                    loadExistingPhotos();
+                } else {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+            } catch (err) {
+                showToast(`Lỗi xóa ảnh: ${err.message}`, 'error');
+            }
+        }
+
         function buildConfigFromForm() {
             const holidays = [...document.querySelectorAll('.holiday-item')]
                 .map(el => el.value.trim())
@@ -355,7 +454,7 @@
             const token = document.getElementById('githubToken').value.trim();
 
             if (!token) {
-                showToast('<strong>Vui lòng điền Personal Access Token (PAT)</strong> để thực hiện lưu tự động!', 'error');
+                showToast('<strong>Vui lòng điền Personal Access Token (PAT)</strong> ở khung bên dưới để thực hiện lưu tự động!', 'error');
                 return;
             }
 
@@ -423,7 +522,7 @@
                 }
 
                 // 4. Trigger GitHub Actions Dispatch
-                showToast('<i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang kích hoạt GitHub Actions render ảnh...', 'info');
+                showToast('<i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang kích hoạt GitHub Actions render ảnh (Mất khoảng 30-45 giây để vẽ ảnh mới)...', 'info');
                 await fetch(`https://api.github.com/repos/${owner}/${repo}/actions/workflows/generate.yml/dispatches`, {
                     method: 'POST',
                     headers: {
@@ -433,8 +532,9 @@
                     body: JSON.stringify({ ref: 'main' })
                 });
 
-                showToast('<i class="fa-solid fa-circle-check text-emerald-600 mr-2"></i><strong>Thành công!</strong> Đã lưu cấu hình và kích hoạt GitHub Actions render ảnh mới!', 'success');
+                showToast('<i class="fa-solid fa-circle-check text-emerald-600 mr-2"></i><strong>Thành công!</strong> Đã lưu cấu hình và kích hoạt GitHub Actions. Ảnh mới đang được vẽ trong khoảng 30-45 giây!', 'success');
                 cancelPhotoSelect();
+                loadExistingPhotos();
 
             } catch (err) {
                 showToast('<strong>Lỗi:</strong> ' + err.message, 'error');

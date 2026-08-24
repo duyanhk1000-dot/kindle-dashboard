@@ -616,16 +616,15 @@ def render_dashboard():
     if isinstance(rad_list, str):
         rad_list = [rad_list]
     for r_item in rad_list:
-        draw_wrapped_text(draw, r_item, fonts["hanzi_small"], rad_x, rad_y, 305 - rad_x, COLOR_BLACK)
+        draw_wrapped_text(draw, r_item, fonts["body_bold"], rad_x, rad_y, 305 - rad_x, COLOR_BLACK)
         rad_y += 16
 
     curr_y = max(rad_y + 2, 513)
     draw.text((left_x, curr_y), "Chiết tự:", font=fonts["small_bold"], fill=COLOR_BLACK)
-    curr_y = draw_wrapped_text(draw, word["breakdown"], fonts["hanzi_small"], left_x, curr_y + 14, left_w, COLOR_BLACK)
+    curr_y = draw_wrapped_text(draw, word["breakdown"], fonts["body_bold"], left_x, curr_y + 14, left_w, COLOR_BLACK)
 
     curr_y += 3
-    # Use fonts["hanzi_small"] for examples to support CJK Chinese characters (e.g. 道德, 品德)
-    draw.text((left_x, curr_y), f"Ví dụ: {word.get('examples', '')}", font=fonts["hanzi_small"], fill=COLOR_BLACK)
+    draw.text((left_x, curr_y), f"Ví dụ: {word.get('examples', '')}", font=fonts["body_bold"], fill=COLOR_BLACK)
 
     # Section Divider Line Pushed Down to Y: 595 to prevent overlap with Weather!
     draw.line([(left_x, 595), (305, 595)], fill=COLOR_GRAY_MID, width=1)
@@ -742,19 +741,8 @@ def render_dashboard():
     ])
     
     curr_hy = holiday_y + 8
-    for h_item in custom_holidays[:4]:
-        draw_wrapped_text(draw, h_item, fonts["body"], right_x, curr_hy, right_w, COLOR_BLACK)
-        curr_hy += 19
-
-    # -------------------------------------------------------------------------
-    # BATTERY & DEVICE SYSTEM STATUS (Y: 740 -> 785)
-    # -------------------------------------------------------------------------
-    batt_y = max(curr_hy + 2, 738)
-    draw.line([(right_x, batt_y), (582, batt_y)], fill=COLOR_GRAY_MID, width=1)
-    
-    draw.text((right_x, batt_y + 4), "🔋 PIN KINDLE & HỆ THỐNG", font=fonts["small_bold"], fill=COLOR_BLACK)
-    draw.text((right_x, batt_y + 19), "• Quản lý pin: Tự động (Daemon RTC)", font=fonts["small"], fill=COLOR_BLACK)
-    draw.text((right_x, batt_y + 32), "• Lịch tự động: 00:00 & 15:30 ICT", font=fonts["small"], fill=COLOR_BLACK)
+    for h_item in custom_holidays[:7]:
+        curr_hy = draw_wrapped_text(draw, h_item, fonts["body"], right_x, curr_hy, right_w, COLOR_BLACK) + 2
 
     # Outer Border for Canvas
     draw.rectangle([0, 0, WIDTH - 1, HEIGHT - 1], outline=COLOR_BLACK, width=2)
