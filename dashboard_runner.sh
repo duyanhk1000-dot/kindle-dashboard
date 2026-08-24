@@ -24,6 +24,15 @@ status_msg() {
     eips 0 0 "$1                                   " >/dev/null 2>&1
 }
 
+# Clean integer file size extraction for BusyBox sh
+get_file_size() {
+    if [ -f "$1" ]; then
+        ls -l "$1" 2>/dev/null | awk '{print $5}' 2>/dev/null || echo 0
+    else
+        echo 0
+    fi
+}
+
 # Calculate seconds until next target wakeup time (15:35 or 00:05 ICT)
 calc_next_wakeup() {
     CURR_H=$(date +%H | sed 's/^0//')
@@ -61,12 +70,12 @@ download_image() {
     HTTPS_URL="https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/dashboard.png?t=${TIMESTAMP}"
     HTTP_URL="http://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/dashboard.png?t=${TIMESTAMP}"
 
-    # Method 1: curl with -k -L (Standard method for Jailbroken Kindles, 100% handles HTTPS & redirects)
+    # Try 1: curl with https
     if command -v curl >/dev/null 2>&1 || [ -x /usr/bin/curl ]; then
-        log "Attempting download via curl with anti-cache timestamp..."
-        curl -s -k -L -m 20 -o "$TMP_IMAGE" "$HTTPS_URL"
-        SIZE=$(wc -c < "$TMP_IMAGE" 2>/dev/null || echo 0)
-        if [ "$SIZE" -gt 20000 ]; then
+        log "Attempting download via curl..."
+        curl -s -k -L -m 25 -o "$TMP_IMAGE" "$HTTPS_URL" 2>&1
+        SIZE=$(get_file_size "$TMP_IMAGE")
+        if [ "$SIZE" -ge 20000 ] 2>/dev/null; then
             log "[✓] Downloaded fresh PNG via curl ($SIZE bytes)."
             return 0
         else
@@ -74,15 +83,26 @@ download_image() {
         fi
     fi
 
-    # Method 2: wget fallback
-    log "Attempting download via wget with anti-cache timestamp..."
+    # Try 2: wget with http
+    log "Attempting download via wget..."
     wget -q -U "Mozilla/5.0" -O "$TMP_IMAGE" "$HTTP_URL" 2>&1
-    SIZE=$(wc -c < "$TMP_IMAGE" 2>/dev/null || echo 0)
-    if [ "$SIZE" -gt 20000 ]; then
+    SIZE=$(get_file_size "$TMP_IMAGE")
+    if [ "$SIZE" -ge 20000 ] 2>/dev/null; then
         log "[✓] Downloaded fresh PNG via wget ($SIZE bytes)."
         return 0
     else
         log "[!] wget output invalid size ($SIZE bytes)."
+    fi
+
+    # Try 3: wget with --no-check-certificate https
+    log "Attempting download via wget https..."
+    wget --no-check-certificate -q -U "Mozilla/5.0" -O "$TMP_IMAGE" "$HTTPS_URL" 2>&1
+    SIZE=$(get_file_size "$TMP_IMAGE")
+    if [ "$SIZE" -ge 20000 ] 2>/dev/null; then
+        log "[✓] Downloaded fresh PNG via wget https ($SIZE bytes)."
+        return 0
+    else
+        log "[!] wget https output invalid size ($SIZE bytes)."
     fi
 
     return 1
@@ -95,15 +115,15 @@ lipc-set-prop com.lab126.wifid enable 1 >/dev/null 2>&1
 lipc-set-prop com.lab126.cmd wirelessEnable 1 >/dev/null 2>&1
 lipc-set-prop com.lab126.cmd wlanEnable 1 >/dev/null 2>&1
 
-# Step 2: Wait for Wi-Fi LIPC cmState to reach CONNECTED
-log "Waiting for Wi-Fi connection (LIPC cmState)..."
+# Step 2: Wait for Wi-Fi connection with multiple checks
+log "Waiting for Wi-Fi connection..."
 RETRY=0
 CONNECTED=0
-while [ $RETRY -lt 25 ]; do
+while [ $RETRY -lt 30 ]; do
     CM_STATE=$(lipc-get-prop com.lab126.wifid cmState 2>/dev/null)
-    if [ "$CM_STATE" = "CONNECTED" ]; then
+    if [ "$CM_STATE" = "CONNECTED" ] || ping -c 1 8.8.8.8 >/dev/null 2>&1 || ping -c 1 raw.githubusercontent.com >/dev/null 2>&1; then
         CONNECTED=1
-        log "[✓] Wi-Fi LIPC cmState: CONNECTED"
+        log "[✓] Wi-Fi network connected."
         break
     fi
     RETRY=$((RETRY + 1))
