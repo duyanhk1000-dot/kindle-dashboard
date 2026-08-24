@@ -1,133 +1,117 @@
-# 📱 Kindle Touch 4th Gen (D01200) Smart Dashboard v2.0
+# 📱 Kindle Touch E-ink Smart Dashboard
 
-Hệ thống **E-ink Smart Dashboard** tự động dành riêng cho máy đọc sách **Kindle Touch 4th Generation (Model D01200)** với màn hình dọc **600x800**, hiển thị 16 cấp độ thang xám (16 Grayscale).
+Hệ thống **E-ink Smart Dashboard** tự động hóa dành cho máy đọc sách **Kindle Touch (4th Generation - Model D01200)** và các thiết bị màn hình E-ink dải tần 600x800 Grayscale (Thang xám 16 cấp độ).
 
-> [!NOTE]
-> Dự án được xây dựng và tối ưu hóa với mô hình **Gemini-2.5-Flash Engine** kết hợp hệ thống cào dữ liệu tài chính đa nguồn **Multi-Provider MarketCrawler** (`vnstock`, KBSV, TCBS, CafeF, Cophieu68, giavang.org).
-
----
-
-## 📸 GIAO DIỆN & TÍNH NĂNG NỔI BẬT
-
-### 1. 🖼️ Nửa Trên: Khung Ảnh Phong Cảnh Hàng Ngày (Y: 8 -> 305)
-- Tự động quét và chọn ảnh từ thư mục ảnh cá nhân `photos/` hoặc tải ảnh ngẫu nhiên từ Unsplash / Picsum.
-- Tự động chuyển đổi sang ảnh 8-bit Grayscale, nâng độ tương phản và tăng độ sắc nét tối ưu cho màn E-ink.
-- **Thanh Header trên cùng**: Hiển thị tên cá nhân hóa `KIỀU DUY ANH - KINDLE DASHBOARD` và Thứ, Ngày Dương lịch + Ngày Âm lịch (`ÂL: 11/7`).
-
-### 2. 📈 Cột Trái Nửa Dưới (X: 18 -> 305):
-- **THỊ TRƯỜNG (Multi-Provider MarketCrawler)**:
-  - **Vàng SJC**: Cào dữ liệu trực tiếp từ `https://giavang.org/` (`144.60 - 147.60 tr (+0.50%)`).
-  - **VN-Index**: Chỉ số đóng cửa chính xác `1,768.12 (+39.04 (+2.26%))`.
-  - **Cổ phiếu theo dõi**: Cập nhật giá 3 mã cổ phiếu `HPG` (`21.70`), `NVL` (`13.35`), `SSI` (`20.75`).
-- **CHỮ HÁN HÔM NAY (Chiết tự & Bộ thủ)**:
-  - Ô vuông chữ Hán to sắc nét **`62x62px`** (`48pt`).
-  - Pinyin & Hán-Việt (`dé - ĐỨC`).
-  - **Cột Bộ thủ**: Mỗi bộ 1 dòng kèm chữ Hán và nghĩa tiếng Việt trong ngoặc đơn (Ví dụ: `• Bộ Xích 彳 (bước đi ngắn)`, `• Bộ Tâm 心 (trái tim)`).
-  - **Chiết tự etymology**: Giải nghĩa câu chuyện chiết tự dễ nhớ.
-  - **Ví dụ mẫu**: Hiển thị đầy đủ chữ Hán ghép từ (Ví dụ: `Đạo đức (道德), Phẩm đức (品德)`).
-- **THỜI TIẾT 3 NGÀY**:
-  - Dự báo thời tiết Hà Nội từ Open-Meteo API (Hôm nay, Ngày mai, Ngày kia).
-  - Biểu tượng Monochrome đơn giản (`[NẮNG]`, `[MÂY]`, `[MƯA]`).
-  - Thêm thông tin **Chất lượng không khí AQI**, **Cảm giác như (°C)** và **Độ ẩm (%)**.
-
-### 3. 📅 Cột Phải Nửa Dưới (X: 318 -> 585):
-- **LỊCH THÁNG**: Lưới lịch tháng đầy đủ (T2 - CN).
-  - **Khoanh tròn đóng khung đậm** ngày hiện tại.
-  - Nổi bật màu nền các ngày **Mùng 1** và **Rằm (15)** Âm lịch.
-- **LỊCH NGHỈ LỄ & LÀM BÙ**: Danh sách ngày lễ Quốc Khánh, nghỉ bù, rằm tháng 7 xếp theo thứ tự thời gian.
+Dự án tự động hóa quá trình cào dữ liệu thời tiết, chỉ số tài chính, giá vàng SJC, chứng khoán Việt Nam (HOSE/HNX), từ vựng Hán tự chiết tự mỗi ngày, kết hợp lịch âm dương và bộ quản lý ảnh cá nhân trực tuyến qua Web Configurator.
 
 ---
 
-## 📁 CẤU TRÚC THƯ MỤC DỰ ÁN
+## ✨ TÍNH NĂNG CHÍNH
 
-```
-d:\code-cho-kindle\dashboard\
-├── render_dashboard.py      # Core script render ảnh dashboard.png (PIL/Pillow)
-├── vnstock_crawler.py       # Multi-Provider MarketCrawler (vnstock, giavang.org, TCBS, CafeF, Cophieu68)
-├── config.json              # File cấu hình giá trị baseline & danh mục cổ phiếu theo dõi
-├── words.json               # Bộ dữ liệu 30+ chữ Hán chiết tự mẫu kèm bộ thủ & ví dụ
-├── requirements.txt         # Các thư viện Python phụ thuộc (vnstock>=4.0.0, Pillow, requests)
-├── dashboard_runner.sh      # Shell script chạy trên máy Kindle (Bật Wi-Fi -> Fetch PNG -> eips -> rtcwake)
-├── install_kindle.sh        # Script tự động cài đặt KUAL extension trên Kindle
-├── dashboard.png            # File ảnh đầu ra (600x800 8-bit Grayscale)
-├── fonts/                   # Thư mục chứa phông chữ TTF (NotoSans-Regular, NotoSans-Bold, NotoSansSC-Regular)
-├── photos/                  # Thư mục chứa ảnh cá nhân tùy chọn
+### 1. 🖼️ Khung Ảnh Phong Cảnh & Ảnh Cá Nhân
+- Tự động hiển thị ngẫu nhiên các bức ảnh cá nhân nằm trong thư mục `photos/` hoặc tải ảnh phong cảnh chất lượng cao.
+- Thuật toán tự động tối ưu hóa hình ảnh: Chuyển đổi dải tần 8-bit Grayscale, nâng độ tương phản và tăng độ sắc nét tối ưu cho tấm nền E-ink.
+
+### 2. 📈 Thị Trường & Tài Chính Real-time (`MarketCrawler`)
+- **Giá vàng SJC**: Cào dữ liệu giá vàng miếng SJC mua vào - bán ra theo thời gian thực từ `giavang.org`.
+- **Chỉ số VN-Index**: Cập nhật điểm số đóng cửa phiên và tỷ lệ phần trăm thay đổi.
+- **Danh mục Cổ phiếu Theo dõi (Watchlist)**: Tích hợp API Simplize REST API cào giá khớp lệnh và % tăng giảm các mã cổ phiếu chứng khoán Việt Nam (HOSE/HNX).
+
+### 3. 🈲 Học Từ Vựng Hán Tự & Chiết Tự Mỗi Ngày
+- Hiển thị chữ Hán to rõ (`56pt`) đúc phông CJK BOLD high-contrast (`NotoSansSC-Bold`).
+- Cung cấp Pinyin, Hán-Việt, phân tích bộ thủ, câu chuyện chiết tự dễ nhớ và các ví dụ ghép từ thực tế.
+
+### 4. 🌤️ Dự Báo Thời Tiết 3 Ngày
+- Tích hợp API Open-Meteo dự báo thời tiết tự động theo địa điểm tùy chỉnh.
+- Hiển thị dự báo nhiệt độ 3 ngày, chỉ số chất lượng không khí (AQI), độ ẩm (%) và cảm giác nhiệt thực tế.
+
+### 5. 📅 Lịch Âm - Dương & Sự Kiện Tùy Chỉnh
+- Lưới lịch tháng đầy đủ Âm - Dương lịch, tự động khoanh tròn ngày hiện tại và làm nổi bật các ngày Mùng 1 & Rằm hàng tháng.
+- Danh sách quản lý các ngày nghỉ lễ Quốc gia và sự kiện cá nhân tùy chỉnh.
+
+### 6. 🌐 Web Configurator Trực Tuyến
+- Giao diện Web đơn giản deployed trực tiếp qua GitHub Pages.
+- Cho phép chỉnh sửa Tiêu đề Dashboard, chọn mã cổ phiếu theo dõi, đổi thành phố thời tiết, quản lý danh sách sự kiện và bộ sưu tập ảnh cá nhân (tải lên / xóa ảnh thumbnail trực tiếp via GitHub REST API).
+
+---
+
+## 🛠️ CẤU TRÚC THƯ MỤC DỰ ÁN
+
+```text
+kindle-dashboard/
+├── render_dashboard.py      # Core script tạo file ảnh dashboard.png (Pillow)
+├── vnstock_crawler.py       # Multi-Provider Market Crawler (Simplize, giavang.org, TCBS)
+├── config.json              # File cấu hình baseline (Tiêu đề, mã cổ phiếu, thời tiết, sự kiện)
+├── words.json               # Cơ sở dữ liệu chữ Hán chiết tự mẫu
+├── dashboard_runner.sh      # Shell script chạy trên Kindle (Smart RTC Wakeup & Anti-Ghosting)
+├── index.html               # Trang Web Configurator trực tuyến (GitHub Pages)
+├── docs/                    # Thư mục deployment cho GitHub Pages
+├── fonts/                   # Thư mục chứa phông chữ TTF/OTF (NotoSans, NotoSansSC-Bold)
+├── photos/                  # Thư mục lưu trữ ảnh phong cảnh / ảnh cá nhân
 └── .github/
     └── workflows/
-        └── generate.yml     # Workflow GitHub Actions tự động render 2 lần/ngày (05:30 & 17:30)
+        └── generate.yml     # Workflow GitHub Actions tự động render (23:55 & 15:25 ICT)
 ```
 
 ---
 
-## 🛠️ HƯỚNG DẪN CHẠY THỬ TRÊN PC (LOCAL TEST)
+## 🚀 HƯỚNG DẪN CÀI ĐẶT & SỬ DỤNG
 
-1. Cài đặt các thư viện cần thiết:
-   ```bash
-   pip install -r requirements.txt
-   ```
+### 1. Chạy Thử Trên Máy Tính (Local Testing)
 
-2. Chạy render tạo ảnh `dashboard.png` locally:
-   ```bash
-   python render_dashboard.py
-   ```
-   Ảnh `dashboard.png` (600x800 Grayscale) sẽ được cập nhật trực tiếp tại thư mục dự án.
+- **Cài đặt thư viện phụ thuộc**:
+  ```bash
+  pip install -r requirements.txt
+  ```
 
----
-
-## 🚀 HƯỚNG DẪN TRIỂN KHAI CHI TIẾT TỪ PC ĐẾN KINDLE
-
-### PHẦN 1: TRIỂN KHAI TRÊN GITHUB (AUTOMATED SERVER RENDER)
-
-1. **Tạo Repository trên GitHub**:
-   - Vào [github.com/new](https://github.com/new) tạo một repo mới (Đặt tên ví dụ: `kindle-dashboard`, chế độ **Public**).
-
-2. **Đẩy mã nguồn từ PC lên GitHub**:
-   - Tại thư mục `d:\code-cho-kindle\dashboard`, chạy các lệnh Git:
-     ```bash
-     git init
-     git add .
-     git commit -m "Complete Kindle Touch Dashboard v2.0"
-     git branch -M main
-     git remote add origin https://github.com/TÊN_GITHUB_CỦA_BẠN/kindle-dashboard.git
-     git push -u origin main
-     ```
-
-3. **Cấp quyền Write cho GitHub Actions (BẮT BUỘC)**:
-   - Vào GitHub Repo -> **Settings** -> **Actions** -> **General**.
-   - Tại mục **Workflow permissions**, chọn **Read and write permissions**.
-   - Bấm **Save**.
-
-4. **Cơ chế chạy tự động**:
-   - GitHub Actions (`generate.yml`) sẽ tự động chạy render ảnh lúc **05:30** và **17:30** mỗi ngày (Giờ Việt Nam).
-   - Bạn cũng có thể vào tab **Actions** -> chọn **Render Kindle Dashboard** -> bấm **Run workflow** để kích hoạt ngay lập tức.
-   - Ảnh tĩnh kết quả trên GitHub Raw có dạng:
-     `https://raw.githubusercontent.com/TÊN_GITHUB_CỦA_BẠN/kindle-dashboard/main/dashboard.png`
+- **Thực thi render tạo ảnh**:
+  ```bash
+  python render_dashboard.py
+  ```
+  File ảnh `dashboard.png` (600x800 Grayscale) sẽ được tạo thành công tại thư mục gốc của dự án.
 
 ---
 
-### PHẦN 2: CÀI ĐẶT LÊN MÁY KINDLE TOUCH 4TH GEN (D01200)
+### 2. Triển Khai Tự Động Hóa Trực Tuyến (GitHub Actions & Pages)
 
-> **Yêu cầu**: Kindle Touch đã Jailbreak và cài đặt **KUAL** (Kindle Unified Application Launcher).
+1. **Đẩy mã nguồn lên GitHub**:
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit - E-ink Kindle Dashboard"
+   git branch -M main
+   git remote add origin https://github.com/<YOUR_USERNAME>/<YOUR_REPO>.git
+   git push -u origin main
+   ```
 
-1. **Cắm cáp USB kết nối Kindle với PC**:
-   - Máy tính sẽ nhận ổ đĩa Kindle (Ví dụ ổ `E:\` hoặc `F:\`).
+2. **Bật quyền Ghi cho Workflow**:
+   - Truy cập **Settings** -> **Actions** -> **General** trên GitHub Repository.
+   - Tại mục **Workflow permissions**, chọn **Read and write permissions** và bấm **Save**.
 
-2. **Chép file cài đặt vào Kindle**:
-   - Tạo thư mục `dashboard` ngay tại ổ đĩa gốc Kindle: `E:\dashboard\` (đường dẫn hệ thống Kindle là `/mnt/us/dashboard/`).
-   - Chép 2 file từ PC vào thư mục `E:\dashboard\`:
-     - [`dashboard_runner.sh`](file:///d:/code-cho-kindle/dashboard/dashboard_runner.sh)
-     - [`install_kindle.sh`](file:///d:/code-cho-kindle/dashboard/install_kindle.sh)
+3. **Bật Trang Web Configurator (GitHub Pages)**:
+   - Truy cập **Settings** -> **Pages**.
+   - Tại mục **Source**, chọn **Deploy from a branch**, branch chọn `main` và thư mục chọn `/docs` (hoặc `/root`). Bấm **Save**.
+   - Trang Web tùy chỉnh trực tuyến sẽ xuất hiện tại địa chỉ: `https://<YOUR_USERNAME>.github.io/<YOUR_REPO>/`.
 
-3. **Cấu hình Tên GitHub trên Kindle**:
-   - Mở file `E:\dashboard\dashboard_runner.sh` bằng text editor (Notepad / VS Code).
-   - Sửa dòng 8-9 thành thông tin GitHub của bạn:
-     ```sh
-     GITHUB_USER="TÊN_GITHUB_CỦA_BẠN"
-     GITHUB_REPO="kindle-dashboard"
-     ```
-   - Lưu file lại và ngắt kết nối USB.
+---
 
-4. **Kích hoạt trên Kindle**:
-   - Trên màn hình Kindle, mở ứng dụng **KUAL**.
-   - Chọn mục **Dashboard Setup** -> Bấm **Enable Dashboard Auto-Refresh**.
-   - Kindle sẽ tự động bật Wi-Fi, tải `dashboard.png` từ GitHub, cập nhật màn hình qua `eips -g` và đi vào chế độ ngủ sâu `rtcwake` tiết kiệm 100% pin!
+### 3. Cài Đặt Lên Thiết Bị Kindle Touch (D01200)
+
+> **Yêu cầu**: Kindle Touch đã được Jailbreak và cài đặt ứng dụng **KUAL** (Kindle Unified Application Launcher).
+
+1. Kết nối Kindle với máy tính qua cáp USB.
+2. Tạo thư mục `dashboard` trên ổ đĩa gốc của Kindle: `/mnt/us/dashboard/` (Ví dụ trên Windows là `E:\dashboard\`).
+3. Chép file [`dashboard_runner.sh`](file:///d:/code-cho-kindle/dashboard/dashboard_runner.sh) vào thư mục `dashboard` trên Kindle.
+4. Mở file `dashboard_runner.sh` bằng text editor và thay đổi 2 dòng thông tin repository của bạn:
+   ```sh
+   GITHUB_USER="<YOUR_USERNAME>"
+   GITHUB_REPO="<YOUR_REPO>"
+   ```
+5. Ngắt kết nối USB, mở ứng dụng **KUAL** trên Kindle và chọn **Dashboard Setup** -> **Enable Dashboard Auto-Refresh**.
+6. Kindle sẽ tự động cập nhật Dashboard theo lịch thông minh (**00:00 ICT** cho ngày mới & **15:30 ICT** chốt phiên thị trường).
+
+---
+
+## 📄 GIẤY PHÉP (LICENSE)
+
+Dự án được phát hành theo giấy phép open-source [MIT License](LICENSE). Trân trọng mọi sự đóng góp và phát triển từ cộng đồng!
