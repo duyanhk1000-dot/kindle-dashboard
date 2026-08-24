@@ -500,21 +500,21 @@ def render_dashboard():
     draw.text((580 - date_w, 15), date_str, font=fonts["small_bold"], fill=COLOR_BLACK)
 
     # =========================================================================
-    # PHOTO FRAME BELOW HEADER (Y: 42 -> 305, Dimensions: 572x263px)
+    # PHOTO FRAME BELOW HEADER (Y: 40 -> 315, Dimensions: 572x275px)
     # =========================================================================
-    top_img, photo_source = fetch_daily_image(target_w=572, target_h=263, now_dt=now)
-    canvas.paste(top_img, (14, 42))
-    draw.rectangle([14, 42, 586, 305], outline=COLOR_BLACK, width=1)
+    top_img, photo_source = fetch_daily_image(target_w=572, target_h=275, now_dt=now)
+    canvas.paste(top_img, (14, 40))
+    draw.rectangle([14, 40, 586, 315], outline=COLOR_BLACK, width=1)
 
     # Major horizontal dividing line
-    draw.line([(14, 314), (586, 314)], fill=COLOR_BLACK, width=2)
+    draw.line([(14, 320), (586, 320)], fill=COLOR_BLACK, width=2)
 
     # =========================================================================
     # COLUMN DIVIDER
     # Left Column: X: 15 -> 305 (Width 290px)
     # Right Column: X: 318 -> 585 (Width 267px)
     # =========================================================================
-    draw.line([(312, 320), (312, 788)], fill=COLOR_BLACK, width=1)
+    draw.line([(312, 324), (312, 788)], fill=COLOR_BLACK, width=1)
 
     # =========================================================================
     # LEFT COLUMN (X: 15 -> 305)
@@ -719,9 +719,19 @@ def render_dashboard():
     ])
     
     curr_hy = holiday_y + 8
-    for h_item in custom_holidays[:5]:
+    for h_item in custom_holidays[:4]:
         draw_wrapped_text(draw, h_item, fonts["body"], right_x, curr_hy, right_w, COLOR_BLACK)
-        curr_hy += 20
+        curr_hy += 19
+
+    # -------------------------------------------------------------------------
+    # BATTERY & DEVICE SYSTEM STATUS (Y: 740 -> 785)
+    # -------------------------------------------------------------------------
+    batt_y = max(curr_hy + 2, 738)
+    draw.line([(right_x, batt_y), (582, batt_y)], fill=COLOR_GRAY_MID, width=1)
+    
+    draw.text((right_x, batt_y + 4), "🔋 PIN KINDLE & HỆ THỐNG", font=fonts["small_bold"], fill=COLOR_BLACK)
+    draw.text((right_x, batt_y + 19), "• Quản lý pin: Tự động (Daemon RTC)", font=fonts["small"], fill=COLOR_BLACK)
+    draw.text((right_x, batt_y + 32), "• Lịch tự động: 00:00 & 15:30 ICT", font=fonts["small"], fill=COLOR_BLACK)
 
     # Outer Border for Canvas
     draw.rectangle([0, 0, WIDTH - 1, HEIGHT - 1], outline=COLOR_BLACK, width=2)
