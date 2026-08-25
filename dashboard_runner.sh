@@ -1,9 +1,9 @@
 #!/bin/sh
 # ==============================================================================
 # Kindle Touch 4th Gen (D01200) Smart Dashboard Shell Runner Script
-# Architecture based on pascalw/kindle-dash & MobileRead E-ink standards
+# Architecture based on pascalw/kindle-dash & Native Screensaver Standards
 # Location: /mnt/us/dashboard/dashboard_runner.sh
-# Features: Anti-Cache Timestamp URL & Full E-ink Anti-Ghosting Flash Refresh
+# Features: Linkss Native Screensaver Integration + Direct Framebuffer Anti-Ghosting
 # Target Schedule:
 #   - 00:00 ICT (Midnight date & Hanzi change)
 #   - 15:30 ICT (Stock market closing session update)
@@ -14,6 +14,7 @@ GITHUB_REPO="kindle-dashboard"
 
 TMP_IMAGE="/tmp/dashboard.png"
 LOG_FILE="/mnt/us/dashboard/dashboard.log"
+LINKSS_DIR="/mnt/us/linkss/screensavers"
 
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$LOG_FILE"
@@ -59,7 +60,7 @@ calc_next_wakeup() {
     echo $SLEEP_SEC
 }
 
-# Step 0: Disable native Kindle screensaver daemon from overwriting dashboard (pascalw technique)
+# Step 0: Disable native Kindle screensaver daemon from overwriting dashboard
 lipc-set-prop com.lab126.powerd preventScreenSaver 1 >/dev/null 2>&1
 
 download_image() {
@@ -108,6 +109,24 @@ download_image() {
     return 1
 }
 
+render_and_display() {
+    # Method A: Linkss / Native Screensaver Hack Integration
+    if [ -d "$LINKSS_DIR" ]; then
+        log "Integrating with Linkss Native Screensaver Hack..."
+        rm -f "$LINKSS_DIR"/*
+        cp "$TMP_IMAGE" "$LINKSS_DIR/bg_medium_ss00.png"
+        log "[✓] Updated Linkss screensaver image: bg_medium_ss00.png"
+    fi
+
+    # Method B: Direct Hardware Framebuffer Anti-Ghosting Render
+    log "Performing Direct Hardware Framebuffer Render..."
+    lipc-set-prop com.lab126.powerd preventScreenSaver 1 >/dev/null 2>&1
+    eips -c >/dev/null 2>&1
+    sleep 1
+    eips -f -g "$TMP_IMAGE" >/dev/null 2>&1
+    log "[✓] Hardware Framebuffer rendered via eips -f -g."
+}
+
 status_msg "Updating Dashboard from GitHub..."
 
 # Step 1: Enable Wi-Fi via Kindle LIPC daemons
@@ -130,23 +149,12 @@ while [ $RETRY -lt 30 ]; do
     sleep 1
 done
 
-# Extra 2-second sleep to ensure DNS resolution ready
 sleep 2
 
-# Step 3: Fetch dashboard image and render with full E-ink anti-ghosting flash refresh
+# Step 3: Fetch dashboard image & render
 if download_image; then
     status_msg "Rendering Dashboard Image..."
-    
-    # Anti-ghosting Step 1: Prevent screen saver
-    lipc-set-prop com.lab126.powerd preventScreenSaver 1 >/dev/null 2>&1
-    
-    # Anti-ghosting Step 2: Clear screen to pure white
-    eips -c >/dev/null 2>&1
-    sleep 1
-    
-    # Anti-ghosting Step 3: Perform full screen flash refresh and render PNG image
-    eips -f -g "$TMP_IMAGE" >/dev/null 2>&1
-    log "[✓] Framebuffer updated successfully via eips -f -g."
+    render_and_display
 else
     status_msg "Error: Download failed. Check Wi-Fi."
     log "[!] Download failed: Invalid image size."
